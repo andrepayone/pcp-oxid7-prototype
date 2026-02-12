@@ -1,0 +1,33 @@
+{
+  "name": "payone-gmbh/pcp-oxid7-prototype",
+  "description": "PAYONE PCP Checkout Prototype for OXID eShop 7.x",
+  "type": "oxideshop-module",
+  "keywords": [
+    "oxid",
+    "eshop",
+    "payone",
+    "checkout",
+    "pcp"
+  ],
+  "homepage": "https://github.com/PAYONE-GmbH/pcp-oxid7-prototype",
+  "license": "GPL-3.0-or-later",
+  "authors": [
+    {
+      "name": "PAYONE GmbH",
+      "homepage": "https://www.payone.com"
+    }
+  ],
+  "require": {
+    "php": ">=8.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "Payone\\PcpPrototype\\": "src/"
+    }
+  },
+  "extra": {
+    "oxideshop": {
+      "target-directory": "Payone/PcpPrototype"
+    }
+  }
+}
