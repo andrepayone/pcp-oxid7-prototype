@@ -37,9 +37,9 @@ $aModule = [
         'onDeactivate' => '\Payone\PcpPrototype\Core\Events::onDeactivate',
     ],
     'templates'   => [
-        'payone_checkout.tpl'  => 'payone/pcpprototype/Application/views/pages/payone_checkout.tpl',
-        'payone_redirect.tpl'  => 'payone/pcpprototype/Application/views/pages/payone_redirect.tpl',
-        'payone_thankyou.tpl'  => 'payone/pcpprototype/Application/views/pages/payone_thankyou.tpl',
+        'payone_checkout.tpl'  => 'Application/views/pages/payone_checkout.tpl',
+        'payone_redirect.tpl'  => 'Application/views/pages/payone_redirect.tpl',
+        'payone_thankyou.tpl'  => 'Application/views/pages/payone_thankyou.tpl',
     ],
     'settings' => [
         [
