@@ -30,6 +30,7 @@ $aModule = [
     ],
     'extend'      => [
         \OxidEsales\Eshop\Application\Model\Basket::class => \Payone\PcpPrototype\Model\Basket::class,
+        \OxidEsales\Eshop\Application\Controller\PaymentController::class => \Payone\PcpPrototype\Controller\PaymentController::class,
     ],
     'events'      => [
         'onActivate'   => '\Payone\PcpPrototype\Core\Events::onActivate',
