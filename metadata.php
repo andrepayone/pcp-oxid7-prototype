@@ -41,6 +41,13 @@ $aModule = [
         'payone_redirect.tpl'  => 'Application/views/pages/payone_redirect.tpl',
         'payone_thankyou.tpl'  => 'Application/views/pages/payone_thankyou.tpl',
     ],
+    'blocks' => [
+        [
+            'template' => 'page/checkout/payment.tpl',
+            'block' => 'checkout_payment_longdesc',
+            'file' => 'Application/views/blocks/checkout_payment_longdesc.tpl',
+        ],
+    ],
     'settings' => [
         [
             'group' => 'main',
