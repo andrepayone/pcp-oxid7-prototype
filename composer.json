@@ -18,7 +18,8 @@
     }
   ],
   "require": {
-    "php": ">=8.2"
+    "php": ">=8.2",
+    "payone-gmbh/pcp-serversdk-php": "dev-main"
   },
   "autoload": {
     "psr-4": {
