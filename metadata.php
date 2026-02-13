@@ -1,182 +1,283 @@
 <?php
 
-/**
- * Metadata version
- */
 $sMetadataVersion = '2.1';
 
-/**
- * Module information
- */
 $aModule = [
-    'id'          => 'pcpprototype',
-    'title'       => [
-        'de' => 'PAYONE PCP Checkout Prototyp',
-        'en' => 'PAYONE PCP Checkout Prototype',
+    'id' => 'PayonePcpPrototype',
+    'title' => [
+        'de' => 'PAYONE PCP für OXID eShop',
+        'en' => 'PAYONE PCP for OXID eShop',
     ],
     'description' => [
-        'de' => 'Ein Prototyp-Modul zur Demonstration des PAYONE Commerce Platform Checkout-Prozesses.',
-        'en' => 'A prototype module to demonstrate the PAYONE Commerce Platform checkout process.',
+        'de' => 'Demo-Plugin für die PCP-Omnichannel-Plattform "PAYONE COMMERCE PLATFORM".',
+        'en' => 'Demo-Plugin for the PCP omnichannel platform "PAYONE COMMERCE PLATFORM".',
     ],
-    'thumbnail'   => 'logo.png',
-    'version'     => '1.0.0',
-    'author'      => 'PAYONE GmbH',
-    'url'         => 'https://www.payone.com',
-    'email'       => 'support@payone.com',
-    'controllers'  => [
-        'payone_checkout' => \Payone\PcpPrototype\Controller\CheckoutController::class,
-        'payone_redirect' => \Payone\PcpPrototype\Controller\RedirectController::class,
-        'payone_thankyou' => \Payone\PcpPrototype\Controller\ThankyouController::class,
+    'thumbnail' => 'picture.gif',
+    'version' => '2.0.0',
+    'author' => 'PAYONE GmbH',
+    'email' => 'integrations@payone.com',
+    'url' => 'https://docs.payone.com/pcp/payone-commerce-platform',
+    'extend' => [
+        \OxidEsales\Eshop\Core\ViewConfig::class
+        => \Payone\PcpPrototype\Core\ViewConfig::class,
+        \OxidEsales\Eshop\Application\Controller\Admin\ModuleConfiguration::class
+        => \Payone\PcpPrototype\Controller\Admin\ModuleConfigController::class,
+        \OxidEsales\Eshop\Application\Controller\Admin\OrderOverview::class
+        => \Payone\PcpPrototype\Controller\Admin\OrderOverviewController::class,
+        \OxidEsales\Eshop\Application\Controller\PaymentController::class
+        => \Payone\PcpPrototype\Controller\PaymentController::class,
+        \OxidEsales\Eshop\Application\Controller\OrderController::class
+        => \Payone\PcpPrototype\Controller\OrderController::class,
+        \OxidEsales\Eshop\Application\Controller\ThankYouController::class
+        => \Payone\PcpPrototype\Controller\ThankyouController::class,
+        \OxidEsales\Eshop\Application\Controller\AccountUserController::class
+        => \Payone\PcpPrototype\Controller\AccountUserController::class,
+        \OxidEsales\Eshop\Application\Controller\UserController::class
+        => \Payone\PcpPrototype\Controller\UserController::class,
+        \OxidEsales\Eshop\Application\Model\Order::class
+        => \Payone\PcpPrototype\Model\Order::class,
+        \OxidEsales\Eshop\Application\Model\Payment::class
+        => \Payone\PcpPrototype\Model\Payment::class,
+        \OxidEsales\Eshop\Application\Model\PaymentGateway::class
+        => \Payone\PcpPrototype\Model\PaymentGateway::class,
     ],
-    'extend'      => [
-        \OxidEsales\Eshop\Application\Model\Basket::class => \Payone\PcpPrototype\Model\Basket::class,
-        \OxidEsales\Eshop\Application\Controller\PaymentController::class => \Payone\PcpPrototype\Controller\PaymentController::class,
+    'controllers' => [
+        'pcpinstallmentcontroller'  => \Payone\PcpPrototype\Controller\InstallmentController::class,
+        'pcpapilog_controller'      => \Payone\PcpPrototype\Controller\Admin\ApiLogController::class,
+        'pcpapilog_list_controller' => \Payone\PcpPrototype\Controller\Admin\ApiLogListController::class,
+        'pcpapilog_main_controller' => \Payone\PcpPrototype\Controller\Admin\ApiLogMainController::class,
+        'pcpconfig_upload_controller' => \Payone\PcpPrototype\Controller\Admin\ConfigUploadController::class,
     ],
-    'events'      => [
+    'templates' => [
+        'pcp_apilog.tpl'       => 'Payone/PcpPrototype/views/admin/tpl/pcp_apilog.tpl',
+        'pcp_apilog_list.tpl'  => 'Payone/PcpPrototype/views/admin/tpl/pcp_apilog_list.tpl',
+        'pcp_apilog_main.tpl'  => 'Payone/PcpPrototype/views/admin/tpl/pcp_apilog_main.tpl',
+        'pcpinstallment.tpl'   => 'Payone/PcpPrototype/views/frontend/tpl/page/checkout/pcpinstallment.tpl',
+        'pcpconfig_upload.tpl' => 'Payone/PcpPrototype/views/admin/tpl/pcpconfig_upload.tpl',
+    ],
+    'events' => [
         'onActivate'   => '\Payone\PcpPrototype\Core\Events::onActivate',
         'onDeactivate' => '\Payone\PcpPrototype\Core\Events::onDeactivate',
-    ],
-    'templates'   => [
-        'payone_checkout.tpl'  => 'Application/views/pages/payone_checkout.tpl',
-        'payone_redirect.tpl'  => 'Application/views/pages/payone_redirect.tpl',
-        'payone_thankyou.tpl'  => 'Application/views/pages/payone_thankyou.tpl',
     ],
     'blocks' => [
         [
             'template' => 'page/checkout/payment.tpl',
-            'block' => 'checkout_payment_longdesc',
-            'file' => 'Application/views/blocks/checkout_payment_longdesc.tpl',
+            'block'    => 'select_payment',
+            'file'     => 'views/blocks/pcp_payment_select_override.tpl',
+        ],
+        [
+            'template' => 'page/checkout/payment.tpl',
+            'block'    => 'change_payment',
+            'file'     => 'views/blocks/pcp_change_payment.tpl',
+        ],
+        [
+            'template' => 'page/checkout/thankyou.tpl',
+            'block'    => 'checkout_thankyou_proceed',
+            'file'     => 'views/blocks/pcp_thankyou_checkout_thankyou.tpl',
+        ],
+        [
+            'template' => 'page/checkout/thankyou.tpl',
+            'block'    => 'checkout_thankyou_info',
+            'file'     => 'views/blocks/pcp_checkout_thankyou_info.tpl',
+        ],
+        [
+            'template' => 'page/checkout/order.tpl',
+            'block'    => 'checkout_order_address',
+            'file'     => 'views/blocks/pcp_checkout_order_address.tpl',
+        ],
+        [
+            'template' => 'page/checkout/order.tpl',
+            'block'    => 'checkout_order_btn_submit_bottom',
+            'file'     => 'views/blocks/pcp_checkout_order_btn_submit_bottom.tpl',
+        ],
+        [
+            'template' => 'layout/footer.tpl',
+            'block'    => 'dd_footer_manufacturerlist',
+            'file'     => 'views/blocks/pcp_dd_footer_manufacturerlist.tpl',
+        ],
+        [
+            'template' => 'layout/footer.tpl',
+            'block'    => 'dd_footer_categorytree',
+            'file'     => 'views/blocks/pcp_dd_footer_categorytree.tpl',
+        ],
+        [
+            'template' => 'layout/base.tpl',
+            'block'    => 'base_style',
+            'file'     => 'views/blocks/pcp_base_style.tpl',
+        ],
+        [
+            'template' => 'layout/base.tpl',
+            'block'    => 'base_js',
+            'file'     => 'views/blocks/pcp_base_js.tpl',
+        ],
+        [
+            'template' => 'layout/header.tpl',
+            'block'    => 'layout_header_logo',
+            'file'     => 'views/blocks/pcp_layout_header_logo.tpl',
+        ],
+        [
+            'template' => 'layout/footer.tpl',
+            'block'    => 'footer_main',
+            'file'     => 'views/blocks/pcp_footer_main.tpl',
+        ],
+        [
+            'template' => 'page/shop/start.tpl',
+            'block'    => 'start_bargain_articles',
+            'file'     => 'views/blocks/pcp_start_bargain_articles.tpl',
+        ],
+        [
+            'template' => 'widget/header/categorylist.tpl',
+            'block'    => 'dd_widget_header_categorylist',
+            'file'     => 'views/blocks/pcp_dd_widget_header_categorylist.tpl',
+        ],
+        [
+            'template' => 'form/user_checkout_noregistration.tpl',
+            'block'    => 'user_checkout_noregistration_form',
+            'file'     => 'views/blocks/pcp_user_checkout_noregistration_form.tpl',
+        ],
+        [
+            'template' => 'module_config.tpl',
+            'block'    => 'admin_module_config_form',
+            'file'     => 'views/blocks/pcp_admin_module_config_form.tpl',
+        ],
+        [
+            'template' => 'order_overview.tpl',
+            'block'    => 'admin_order_overview_send_form',
+            'file'     => 'views/blocks/pcp_admin_order_overview_send_form.tpl',
         ],
     ],
     'settings' => [
         [
             'group' => 'main',
-            'name' => 'pcpMerchantId',
-            'type' => 'str',
+            'name'  => 'pcpMerchantId',
+            'type'  => 'str',
+            'value' => '',
         ],
         [
             'group' => 'main',
-            'name' => 'pcpApiEndpoint',
-            'type' => 'str',
-            'value' => 'https://api.preprod.commerce.payone.com'
+            'name'  => 'pcpApiEndpoint',
+            'type'  => 'str',
+            'value' => 'https://api.preprod.commerce.payone.com',
         ],
         [
             'group' => 'main',
-            'name' => 'pcpApiKey',
-            'type' => 'str',
+            'name'  => 'pcpApiKey',
+            'type'  => 'str',
+            'value' => '',
         ],
         [
             'group' => 'main',
-            'name' => 'pcpApiSecret',
-            'type' => 'str',
+            'name'  => 'pcpApiSecret',
+            'type'  => 'str',
+            'value' => '',
         ],
         [
             'group' => 'main',
-            'name' => 'pcpDemoPaymentToken',
-            'type' => 'str',
-            'value' => ''
+            'name'  => 'pcpDemoPaymentToken',
+            'type'  => 'str',
+            'value' => '',
         ],
         [
             'group' => 'main',
-            'name' => 'pcpUseFixedNoregestration',
-            'type' => 'bool',
-            'value' => true
+            'name'  => 'pcpUseFixedNoregestration',
+            'type'  => 'bool',
+            'value' => true,
         ],
         [
             'group' => 'main',
-            'name' => 'pcpUseFixedShipping',
-            'type' => 'bool',
-            'value' => true
+            'name'  => 'pcpUseFixedShipping',
+            'type'  => 'bool',
+            'value' => true,
         ],
         [
             'group' => 'main',
-            'name' => 'pcpShowDemoShopButton',
-            'type' => 'bool',
-            'value' => true
+            'name'  => 'pcpShowDemoShopButton',
+            'type'  => 'bool',
+            'value' => true,
         ],
         [
             'group' => 'main',
-            'name' => 'pcpFixedShippingName',
-            'type' => 'str',
-            'value' => 'Shop-Company'
+            'name'  => 'pcpFixedShippingName',
+            'type'  => 'str',
+            'value' => 'Shop-Company',
         ],
         [
             'group' => 'main',
-            'name' => 'pcpFixedShippingStreet',
-            'type' => 'str',
-            'value' => 'Shop-Company Street'
+            'name'  => 'pcpFixedShippingStreet',
+            'type'  => 'str',
+            'value' => 'Shop-Company Street',
         ],
         [
             'group' => 'main',
-            'name' => 'pcpFixedShippingStreetNr',
-            'type' => 'str',
-            'value' => '123'
+            'name'  => 'pcpFixedShippingStreetNr',
+            'type'  => 'str',
+            'value' => '123',
         ],
         [
             'group' => 'main',
-            'name' => 'pcpFixedShippingZip',
-            'type' => 'str',
-            'value' => '40474'
+            'name'  => 'pcpFixedShippingZip',
+            'type'  => 'str',
+            'value' => '40474',
         ],
         [
             'group' => 'main',
-            'name' => 'pcpFixedShippingCity',
-            'type' => 'str',
-            'value' => 'Düsseldorf'
+            'name'  => 'pcpFixedShippingCity',
+            'type'  => 'str',
+            'value' => 'Düsseldorf',
         ],
         [
             'group' => 'main',
-            'name' => 'pcpUseCustomShopLogo',
-            'type' => 'bool',
-            'value' => false
+            'name'  => 'pcpUseCustomShopLogo',
+            'type'  => 'bool',
+            'value' => false,
         ],
         [
             'group' => 'main',
-            'name' => 'pcpUseCustomColors',
-            'type' => 'bool',
-            'value' => false
+            'name'  => 'pcpUseCustomColors',
+            'type'  => 'bool',
+            'value' => false,
         ],
         [
             'group' => 'main',
-            'name' => 'pcpPrimaryColor',
-            'type' => 'str',
-            'value' => '#0096d6'
+            'name'  => 'pcpPrimaryColor',
+            'type'  => 'str',
+            'value' => '#0096d6',
         ],
         [
             'group' => 'main',
-            'name' => 'pcpSecondaryColorBright',
-            'type' => 'str',
-            'value' => '#87cdec'
+            'name'  => 'pcpSecondaryColorBright',
+            'type'  => 'str',
+            'value' => '#87cdec',
         ],
         [
             'group' => 'main',
-            'name' => 'pcpSecondaryColorDark',
-            'type' => 'str',
-            'value' => '#005a80'
+            'name'  => 'pcpSecondaryColorDark',
+            'type'  => 'str',
+            'value' => '#005a80',
         ],
         [
             'group' => 'main',
-            'name' => 'pcpTertiaryColor1',
-            'type' => 'str',
-            'value' => '#005a80'
+            'name'  => 'pcpTertiaryColor1',
+            'type'  => 'str',
+            'value' => '#005a80',
         ],
         [
             'group' => 'main',
-            'name' => 'pcpDangerColor',
-            'type' => 'str',
-            'value' => '#f50057'
+            'name'  => 'pcpDangerColor',
+            'type'  => 'str',
+            'value' => '#f50057',
         ],
         [
             'group' => 'main',
-            'name' => 'pcpWarningColor',
-            'type' => 'str',
-            'value' => '#f50057'
+            'name'  => 'pcpWarningColor',
+            'type'  => 'str',
+            'value' => '#f50057',
         ],
         [
             'group' => 'main',
-            'name' => 'pcpBlackColor',
-            'type' => 'str',
-            'value' => '#0d0d0d'
+            'name'  => 'pcpBlackColor',
+            'type'  => 'str',
+            'value' => '#0d0d0d',
         ],
-    ]
+    ],
 ];
