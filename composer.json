@@ -17,6 +17,12 @@
       "homepage": "https://www.payone.com"
     }
   ],
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/PAYONE-GmbH/PCP-ServerSDK-php"
+    }
+  ],
   "require": {
     "php": ">=8.2",
     "payone-gmbh/pcp-serversdk-php": "dev-main"

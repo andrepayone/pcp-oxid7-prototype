@@ -1,48 +1,71 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Payone\PcpPrototype\Controller;
 
-use Payone\PcpPrototype\Core\PayoneApiService;
-use OxidEsales\Eshop\Application\Controller\PaymentController as OxidPaymentController;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\Eshop\Core\Request;
-use OxidEsales\Eshop\Core\Utils;
+use Payone\PcpPrototype\Core\PayoneApiService;
+use Payone\PcpPrototype\Model\Payment;
 
 class PaymentController extends PaymentController_parent
 {
-    /**
-     * Validates the selected payment method. If the PAYONE PCP payment method is chosen,
-     * it uses the PayoneApiService to create a checkout and redirects the user.
-     *
-     * @return mixed
-     */
+    protected ?string $pcpMerchantReference = null;
+    protected ?string $pcpCheckoutReference = null;
+
+    public function isPcpPayment(): bool
+    {
+        $sPaymentId = $this->getCheckedPaymentId();
+        return Payment::isPcpPaymentType($sPaymentId);
+    }
+
     public function validatePayment()
     {
-        $paymentId = Registry::get(Request::class)->getRequestEscapedParameter('paymentid');
+        $result = parent::validatePayment();
+        $sPaymentId = $this->getCheckedPaymentId();
 
-        if ($paymentId !== 'payone_checkout') {
-            return parent::validatePayment();
+        if ($result === 'order' && Payment::isPcpInstallment($sPaymentId)) {
+            return 'pcpinstallmentcontroller';
         }
 
-        $session = Registry::getSession();
-        $basket = $session->getBasket();
+        return $result;
+    }
 
-        $apiService = new PayoneApiService();
-        $merchantReference = 'oxid-' . uniqid();
+    public function pcpGetCardHolder(): string
+    {
+        $oUser = $this->getUser();
+        return $oUser->oxuser__oxfname->value . ' ' . $oUser->oxuser__oxlname->value;
+    }
 
-        $response = $apiService->createCheckout(
-            $basket->getPayoneBasketAmount(),
-            $basket->getBasketCurrency()->name,
-            $merchantReference
-        );
+    public function pcpGetMerchantReference(string $sPrefix = 'dm'): string
+    {
+        if ($this->pcpMerchantReference === null || $sPrefix !== 'dm') {
+            $oApiService = oxNew(PayoneApiService::class);
+            $sRef = $oApiService->generateReference($sPrefix);
 
-        if ($response && isset($response['checkoutId'], $response['redirectUrl'])) {
-            $session->setVariable('payoneCheckoutId', $response['checkoutId']);
-            $session->setVariable('payoneMerchantReference', $merchantReference);
-            Utils::redirect($response['redirectUrl'], false);
-        } else {
-            Registry::get(Utils::class)->addErrorToDisplay('PAYONE_PCP_CHECKOUT_FAILED');
-            return 'payment';
+            if ($sPrefix === 'dm') {
+                $this->pcpMerchantReference = $sRef;
+            } else {
+                return $sRef;
+            }
         }
+
+        return $this->pcpMerchantReference;
+    }
+
+    public function pcpGetCheckoutReference(string $sPrefix = 'ck'): string
+    {
+        if ($this->pcpCheckoutReference === null || $sPrefix !== 'ck') {
+            $oApiService = oxNew(PayoneApiService::class);
+            $sRef = $oApiService->generateReference($sPrefix);
+
+            if ($sPrefix === 'ck') {
+                $this->pcpCheckoutReference = $sRef;
+            } else {
+                return $sRef;
+            }
+        }
+
+        return $this->pcpCheckoutReference;
     }
 }
