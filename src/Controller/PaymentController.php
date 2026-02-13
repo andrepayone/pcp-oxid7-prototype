@@ -24,7 +24,7 @@ class PaymentController extends PaymentController_parent
             return parent::validatePayment();
         }
 
-        $session = $this->getSession();
+        $session = Registry::getSession();
         $basket = $session->getBasket();
 
         $apiService = new PayoneApiService();

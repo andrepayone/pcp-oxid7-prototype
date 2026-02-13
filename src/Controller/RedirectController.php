@@ -23,7 +23,7 @@ class RedirectController extends FrontendController
         parent::render();
 
         /** @var Session $session */
-        $session = $this->getSession();
+        $session = Registry::getSession();
         $basket = $session->getBasket();
         $user = $this->getUser();
 
