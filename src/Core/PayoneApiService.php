@@ -2,20 +2,19 @@
 
 namespace Payone\PcpPrototype\Core;
 
-use GuzzleHttp\Exception\GuzzleException;
 use OxidEsales\Eshop\Core\Registry;
-use Payone\Pcp\SDK\Communicator\CommunicatorConfiguration;
-use Payone\Pcp\SDK\Communicator\CommunicatorException;
-use Payone\Pcp\SDK\Service\CheckoutService;
-use Payone\Pcp\SDK\Service\Processor\CheckoutProcessor;
-use Payone\Pcp\SDK\Session\Session;
+use PayoneCommercePlatform\Sdk\ApiClient\CheckoutApiClient;
+use PayoneCommercePlatform\Sdk\ApiClient\CommunicatorException;
+use PayoneCommercePlatform\Sdk\CommunicatorConfiguration;
+use PayoneCommercePlatform\Sdk\Errors\ApiErrorResponseException;
+use PayoneCommercePlatform\Sdk\Models\CreateCheckoutRequest;
 
 class PayoneApiService
 {
-    private CheckoutProcessor $checkoutProcessor;
+    private CheckoutApiClient $checkoutApiClient;
 
     /**
-     * Initializes the service by setting up the SDK communicator and processors.
+     * Initializes the service by setting up the SDK communicator and client.
      */
     public function __construct()
     {
@@ -27,13 +26,11 @@ class PayoneApiService
             $config['pcpApiSecret'] ?? ''
         );
 
-        $sdkSession = new Session();
-        $checkoutService = new CheckoutService($communicatorConfig);
-        $this->checkoutProcessor = new CheckoutProcessor($checkoutService, $sdkSession);
+        $this->checkoutApiClient = new CheckoutApiClient($communicatorConfig);
     }
 
     /**
-     * Creates a new checkout using the PCP SDK.
+     * Creates a new checkout using the PCP SDK's CheckoutApiClient.
      *
      * @param int $amount The amount in the smallest currency unit (e.g., cents).
      * @param string $currency The ISO currency code.
@@ -45,23 +42,22 @@ class PayoneApiService
         $returnUrl = Registry::getConfig()->getShopUrl() . 'index.php?cl=payone_redirect';
         $notificationUrl = Registry::getConfig()->getShopUrl() . 'index.php?cl=payone_notification';
 
+        $checkoutRequest = new CreateCheckoutRequest();
+        $checkoutRequest->setAmount($amount);
+        $checkoutRequest->setCurrency($currency);
+        $checkoutRequest->setMerchantReference($merchantReference);
+        $checkoutRequest->setReturnUrl($returnUrl);
+        $checkoutRequest->setNotificationUrl($notificationUrl);
+
         try {
-            $response = $this->checkoutProcessor->createCheckout(
-                $amount,
-                $currency,
-                $merchantReference,
-                $returnUrl,
-                $notificationUrl
-            );
+            $response = $this->checkoutApiClient->createCheckout($checkoutRequest);
 
             return [
                 'checkoutId' => $response->getCheckoutId(),
                 'redirectUrl' => $response->getRedirectUrl(),
             ];
-        } catch (CommunicatorException | GuzzleException $e) {
-            // In a real module, you would log this error.
-            // For now, we return null to indicate failure.
-            Registry::getLogger()->error('PAYONE PCP SDK Error: ' . $e->getMessage());
+        } catch (ApiErrorResponseException | CommunicatorException $e) {
+            Registry::getLogger()->error('PAYONE PCP SDK Error: ' . $e->getMessage(), [$e]);
             return null;
         }
     }
