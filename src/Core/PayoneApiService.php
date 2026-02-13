@@ -189,6 +189,35 @@ class PayoneApiService
         );
     }
 
+    public function refundOrder(string $sCommerceCaseId, string $sCheckoutId)
+    {
+        return $this->orderManagementClient->returnOrder(
+            $this->merchantId,
+            $sCommerceCaseId,
+            $sCheckoutId,
+            new \PayoneCommercePlatform\Sdk\Models\ReturnRequest(
+                returnType: \PayoneCommercePlatform\Sdk\Models\ReturnType::FULL,
+            ),
+        );
+    }
+
+    public function cancelOrder(
+        string $sCommerceCaseId,
+        string $sCheckoutId,
+        string $sPaymentExecutionId,
+        \PayoneCommercePlatform\Sdk\Models\CancellationReason $cancellationReason
+    ) {
+        return $this->paymentExecutionClient->cancelPaymentExecution(
+            $this->merchantId,
+            $sCommerceCaseId,
+            $sCheckoutId,
+            $sPaymentExecutionId,
+            new \PayoneCommercePlatform\Sdk\Models\CancelPaymentRequest(
+                cancellationReason: $cancellationReason,
+            ),
+        );
+    }
+
     protected function completeInstallmentPayment($oUser)
     {
         $oSession = Registry::getSession();
