@@ -1,0 +1,71 @@
+{% extends 'page/checkout/order.html.twig' %}
+
+{% block checkout_order_address %}
+    {% if oView.pcpIsStoreShipping() %}
+        <div id="orderAddress" class="row">
+            <div class="col-12 col-md-6">
+                <form action="{{ oViewConf.getSslSelfLink() }}" method="post">
+                    <div class="hidden">
+                        {{ oViewConf.getHiddenSid() }}
+                        <input type="hidden" name="cl" value="user">
+                        <input type="hidden" name="fnc" value="">
+                    </div>
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                {{ translate({ ident: "BILLING_ADDRESS" }) }}
+                                <button type="submit" class="btn btn-sm btn-warning float-end submitButton largeButton" title="{{ translate({ ident: 'EDIT' }) }}">
+                                    <i class="fas fa-pencil-alt"></i>
+                                </button>
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            {% include "widget/address/billing_address.html.twig" %}
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-12 col-md-6">
+                <form action="{{ oViewConf.getSslSelfLink() }}" method="post">
+                    <div class="hidden">
+                        {{ oViewConf.getHiddenSid() }}
+                        <input type="hidden" name="cl" value="user">
+                        <input type="hidden" name="fnc" value="">
+                    </div>
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h3 class="card-title">{{ translate({ ident: "SHIPPING_ADDRESS" }) }}</h3>
+                        </div>
+                        <div class="card-body">
+                            {{ oViewConf.pcpGetStringConfigParam("pcpFixedShippingName") }}<br>
+                            {{ oViewConf.pcpGetStringConfigParam("pcpFixedShippingStreet") }} {{ oViewConf.pcpGetStringConfigParam("pcpFixedShippingStreetNr") }}<br>
+                            {{ oViewConf.pcpGetStringConfigParam("pcpFixedShippingZip") }} {{ oViewConf.pcpGetStringConfigParam("pcpFixedShippingCity") }}
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    {% else %}
+        {{ parent() }}
+    {% endif %}
+{% endblock %}
+
+{% block checkout_order_btn_confirm_bottom %}
+    {% if oView.isPcpPayment() %}
+        <div class="mb-3 row">
+            <label class="req col-form-label col-lg-3">{{ translate({ ident: "PCP_MERCHANT_REFERENCE_ORDER" }) }}:</label>
+            <div class="col-lg-9">
+                <input type="text" class="form-control" size="20" maxlength="20" name="pcp_merchant_reference" value="{{ oView.getPcpMerchantReference() }}">
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <label class="req col-form-label col-lg-3">{{ translate({ ident: "PCP_CHECKOUT_REFERENCE_ORDER" }) }}:</label>
+            <div class="col-lg-9">
+                <input type="text" class="form-control" size="20" maxlength="20" name="pcp_checkout_reference" value="{{ oView.getPcpCheckoutReference() }}">
+            </div>
+        </div>
+    {% endif %}
+    <button type="submit" class="btn btn-lg btn-primary float-end submitButton nextStep largeButton">
+        <i class="fas fa-check"></i> {{ translate({ ident: "SUBMIT_ORDER" }) }}
+    </button>
+{% endblock %}

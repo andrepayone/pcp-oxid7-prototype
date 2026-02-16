@@ -1,0 +1,54 @@
+{% include "headitem.html.twig" with {title: "SYSREQ_MAIN_TITLE"|translate} %}
+
+{% if readonly %}
+    {% set readonly = "readonly disabled" %}
+{% else %}
+    {% set readonly = "" %}
+{% endif %}
+
+<form autocomplete="off" name="transfer" id="transfer" action="{{ oViewConf.getSelfLink()|raw }}" method="post">
+    {{  oViewConf.getHiddenSid()|raw  }}
+    <input type="hidden" name="oxid" value="{{  oxid  }}">
+    <input type="hidden" name="cl" value="ConfigUploadController">
+</form>
+
+{% if pcpResultMessage %}
+<div>
+    <b>{{ pcpResultMessage }}</b>
+</div>
+<hr id="pcp_setup_result_message">
+{% endif %}
+
+{% if isPcpDemoModule %}
+<div>
+    <form name="pcpShopLogoForm" id="pcpShopLogoForm" enctype="multipart/form-data" action="{{ oViewConf.getSelfLink()|raw }}" method="post">
+        <input type="hidden" name="MAX_FILE_SIZE" value="{{ iMaxUploadFileSize }}">
+        {{ oViewConf.getHiddenSid() }}
+        <input type="hidden" name="oxid" value="[{$oxid}]">
+        <input type="hidden" name="cl" value="ConfigUploadController">
+        <input type="hidden" name="fnc" value="pcpUploadShopLogo">
+        <table style="border: 0;">
+            <tr>
+                <td>
+                    <input class="editinput" name="pcpShopLogo" type="file">
+                </td>
+                <td>
+                    {% set customShopLogo = oView.pcpGetCustomShopLogo() %}
+                    {% if customShopLogo %}
+                        <img class="picPreview" src="{{ customShopLogo }}">
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <input type="submit" class="edittext" name="save" value="{{ translate({ ident: "ARTICLE_PICTURES_SAVE" }) }}" {{ readonly }}>
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+{% else %}
+<div>
+    This is only used for PAYONE Commerce Platform Demo module.
+</div>
+{% endif %}

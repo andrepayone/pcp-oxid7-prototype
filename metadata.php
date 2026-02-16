@@ -53,7 +53,7 @@ $aModule = [
         'pcp_apilog_list.tpl'       => 'Payone/PcpPrototype/views/admin/tpl/pcp_apilog_list.tpl',
         'pcp_apilog_main.tpl'       => 'Payone/PcpPrototype/views/admin/tpl/pcp_apilog_main.tpl',
         'pcpconfig_upload.tpl'      => 'Payone/PcpPrototype/views/admin/tpl/pcpconfig_upload.tpl',
-        'pcpinstallment.html.twig'  => 'Payone/PcpPrototype/views/frontend/twig/page/checkout/pcpinstallment.html.twig',
+        'pcpinstallment.html.twig'  => 'Payone/PcpPrototype/views/frontend/page/checkout/pcpinstallment.html.twig',
     ],
     'events' => [
         'onActivate'   => '\Payone\PcpPrototype\Core\Events::onActivate',

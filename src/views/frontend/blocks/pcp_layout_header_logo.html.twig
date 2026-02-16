@@ -1,6 +1,0 @@
-{% set slogoImg = oViewConf.pcpGetShopLogo() %}
-{% set sLogoWidth = oViewConf.getViewThemeParam("sLogoWidth") %}
-{% set sLogoHeight = oViewConf.getViewThemeParam("sLogoHeight") %}
-<a href="{{ oViewConf.getHomeLink() }}" title="{{ oxcmp_shop.oxshops__oxtitleprefix.value }}">
-    <img src="{{ slogoImg }}" alt="{{ oxcmp_shop.oxshops__oxtitleprefix.value }}" style="{% if sLogoWidth %}width:auto;max-width:{{ sLogoWidth }}px;{% endif %}{% if sLogoHeight %}height:auto;max-height:{{ sLogoHeight }}px;{% endif %}">
-</a>
