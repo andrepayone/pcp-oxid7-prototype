@@ -1,0 +1,41 @@
+<?php
+$sLangName = "Deutsch";
+// -------------------------------
+// RESOURCE IDENTITFIER = STRING
+// -------------------------------
+$aLang = [
+    'PCP_DEMO_CREDITCARD'                   => 'Kartentyp',
+    'PCP_DEMO_CC_NUMBER'                    => 'Kreditkartennummer',
+    'PCP_DEMO_CARD_SECURITY_CODE'           => 'Prüfnummer',
+    'PCP_CC_CARDHOLDER'                     => 'Karteneigentümer',
+    'PCP_VALID_UNTIL'                       => 'Gültig bis',
+    'PCP_WILL_BE_DELIVERED_TO'              => 'Wird geliefert an',
+    'PCP_CAN_BE_PICKED_UP_AT'               => 'Ihr Produkt liegt nun in unserem PAYONE Seamless Commerce Store für Sie zur Abholung bereit',
+    'PCP_TXID'                              => 'Transaktions-Identifikationsnummer',
+    'PCP_COMMERCE_CASE_ID'                  => 'Fall-Identifiationsnummer',
+    'PCP_MERCHANT_REFERENCE'                => 'Händler-Referenz',
+    'PCP_CHECKOUT_REFERENCE'                => 'Checkout-Referenz',
+    'PCP_CHECKOUT_ID'                       => 'Kauf-Identifiationsnummer',
+    'PCP_YOUR_PAYMENT_REFERENCE_DATA'       => 'Ihre Zahlungsreferenzdaten',
+    'PCP_DEMO_IBAN'                         => 'IBAN',
+    'PCP_DEBIT_ACCOUNTHOLDER'               => 'Kontoinhaber',
+    'PCP_YOUR_CHOICE'                       => '<span style="color:#0096D6;font-weight: bold;">IHRE AUSWAHL</span><br><span style="color:#000;font-weight: bold;">ATTRAKTIVER PRODUKTE</span>',
+    'PCP_START_SUBTEXT'                     => 'Shopping mit gutem Gewissen: Es ist uns ein wichtiges Anliegen, dass all unsere angebotenen Produkte nachhaltige Projekte unterstützen.<br>So werden Lederreste aus Produktionsprozessen zu neuen hochwertigen Produkten aufgewertet statt vernichtet und unsere angebotene Schokolade ist aus fairer Herstellung.',
+    'PCP_MERCHANT_REFERENCE_ORDER'          => 'Referenz der Bestellung (Merchant Reference)',
+    'PCP_CHECKOUT_REFERENCE_ORDER'          => 'Checkout-Referenz der Bestellung (Checkout Reference)',
+    'PCP_BIRTHDATE'                         => 'Geburtsdatum',
+    'PCP_INSTALLMENT_PER_MONTH'             => 'pro Monat',
+    'PCP_INSTALLMENT_RATES'                 => 'Raten',
+    'PCP_LAST_INSTALLMENT_RATE'             => 'Letzte Rate',
+    'PCP_INSTALLMENT_EFF_INTEREST_RATE'     => 'Effektiver Zins',
+    'PCP_INSTALLMENT_NOM_INTEREST_RATE'     => 'Nominaler Zins',
+    'PCP_INSTALLMENT_TOTAL_AMOUNT'          => 'Gesamtbetrag',
+    'PCP_INSTALLMENT_FIRST_RATE_DATE'       => 'Fälligkeit der ersten Rate',
+    'PCP_INSTALLMENT_INFO'                  => 'Detaillierte Informationen herunterladen',
+    'PCP_INSTALLMENT_CHOOSE_OPTION'         => 'Wählen Sie Ihre Ratenoption',
+    'PCP_CUSTOMER_IDENT'                    => 'Kunden-Identifikation',
+    'PCP_INSTALLMENT_ACCOUNT_DATA'          => 'Kontendaten',
+    'PAGE_TITLE_PCPINSTALLMENTCONTROLLER'   => 'Ratenkauf',
+    'PCP_MESSAGE_INSTALLMENT_PAYMENT'       => 'Ratenauswahl erfolgt im nächsten Schritt',
+    'PCP_MESSAGE_PAY_IN_STORE_PAYMENT'      => 'Online reservieren und im Ladengeschäft abholen und bezahlen.',
+];

@@ -1,0 +1,8 @@
+<section class="col-12 col-sm-3 footer-box footer-box-categories">
+    <div class="h4 footer-box-title"></div>
+    <div class="footer-box-content">
+        {% block dd_footer_categorytree_inner %}
+            {{ include_widget({ cl: "oxwCategoryTree", _parent: oView.getClassName(), sWidgetType: "footer", noscript: 1, nocookie: 1 }) }}
+        {% endblock %}
+    </div>
+</section>

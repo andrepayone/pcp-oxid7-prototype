@@ -49,101 +49,93 @@ $aModule = [
         'pcpconfig_upload_controller' => \Payone\PcpPrototype\Controller\Admin\ConfigUploadController::class,
     ],
     'templates' => [
-        'pcp_apilog.tpl'       => 'Payone/PcpPrototype/views/admin/tpl/pcp_apilog.tpl',
-        'pcp_apilog_list.tpl'  => 'Payone/PcpPrototype/views/admin/tpl/pcp_apilog_list.tpl',
-        'pcp_apilog_main.tpl'  => 'Payone/PcpPrototype/views/admin/tpl/pcp_apilog_main.tpl',
-        'pcpinstallment.tpl'   => 'Payone/PcpPrototype/views/frontend/tpl/page/checkout/pcpinstallment.tpl',
-        'pcpconfig_upload.tpl' => 'Payone/PcpPrototype/views/admin/tpl/pcpconfig_upload.tpl',
+        'pcp_apilog.tpl'            => 'Payone/PcpPrototype/views/admin/tpl/pcp_apilog.tpl',
+        'pcp_apilog_list.tpl'       => 'Payone/PcpPrototype/views/admin/tpl/pcp_apilog_list.tpl',
+        'pcp_apilog_main.tpl'       => 'Payone/PcpPrototype/views/admin/tpl/pcp_apilog_main.tpl',
+        'pcpconfig_upload.tpl'      => 'Payone/PcpPrototype/views/admin/tpl/pcpconfig_upload.tpl',
+        'pcpinstallment.html.twig'  => 'Payone/PcpPrototype/views/frontend/twig/page/checkout/pcpinstallment.html.twig',
     ],
     'events' => [
         'onActivate'   => '\Payone\PcpPrototype\Core\Events::onActivate',
         'onDeactivate' => '\Payone\PcpPrototype\Core\Events::onDeactivate',
     ],
     'blocks' => [
-        [
-            'template' => 'page/checkout/payment.tpl',
-            'block'    => 'select_payment',
-            'file'     => 'views/blocks/pcp_payment_select_override.tpl',
-        ],
-        [
-            'template' => 'page/checkout/payment.tpl',
-            'block'    => 'change_payment',
-            'file'     => 'views/blocks/pcp_change_payment.tpl',
-        ],
-        [
-            'template' => 'page/checkout/thankyou.tpl',
-            'block'    => 'checkout_thankyou_proceed',
-            'file'     => 'views/blocks/pcp_thankyou_checkout_thankyou.tpl',
-        ],
-        [
-            'template' => 'page/checkout/thankyou.tpl',
-            'block'    => 'checkout_thankyou_info',
-            'file'     => 'views/blocks/pcp_checkout_thankyou_info.tpl',
-        ],
-        [
-            'template' => 'page/checkout/order.tpl',
-            'block'    => 'checkout_order_address',
-            'file'     => 'views/blocks/pcp_checkout_order_address.tpl',
-        ],
-        [
-            'template' => 'page/checkout/order.tpl',
-            'block'    => 'checkout_order_btn_submit_bottom',
-            'file'     => 'views/blocks/pcp_checkout_order_btn_submit_bottom.tpl',
-        ],
-        [
-            'template' => 'layout/footer.tpl',
-            'block'    => 'dd_footer_manufacturerlist',
-            'file'     => 'views/blocks/pcp_dd_footer_manufacturerlist.tpl',
-        ],
-        [
-            'template' => 'layout/footer.tpl',
-            'block'    => 'dd_footer_categorytree',
-            'file'     => 'views/blocks/pcp_dd_footer_categorytree.tpl',
-        ],
-        [
-            'template' => 'layout/base.tpl',
-            'block'    => 'base_style',
-            'file'     => 'views/blocks/pcp_base_style.tpl',
-        ],
-        [
-            'template' => 'layout/base.tpl',
-            'block'    => 'base_js',
-            'file'     => 'views/blocks/pcp_base_js.tpl',
-        ],
-        [
-            'template' => 'layout/header.tpl',
-            'block'    => 'layout_header_logo',
-            'file'     => 'views/blocks/pcp_layout_header_logo.tpl',
-        ],
-        [
-            'template' => 'layout/footer.tpl',
-            'block'    => 'footer_main',
-            'file'     => 'views/blocks/pcp_footer_main.tpl',
-        ],
-        [
-            'template' => 'page/shop/start.tpl',
-            'block'    => 'start_bargain_articles',
-            'file'     => 'views/blocks/pcp_start_bargain_articles.tpl',
-        ],
-        [
-            'template' => 'widget/header/categorylist.tpl',
-            'block'    => 'dd_widget_header_categorylist',
-            'file'     => 'views/blocks/pcp_dd_widget_header_categorylist.tpl',
-        ],
-        [
-            'template' => 'form/user_checkout_noregistration.tpl',
-            'block'    => 'user_checkout_noregistration_form',
-            'file'     => 'views/blocks/pcp_user_checkout_noregistration_form.tpl',
-        ],
+        // === Admin-Blocks (Smarty) ===
         [
             'template' => 'module_config.tpl',
             'block'    => 'admin_module_config_form',
-            'file'     => 'views/blocks/pcp_admin_module_config_form.tpl',
+            'file'     => 'views/admin/blocks/pcp_admin_module_config_form.tpl',
         ],
         [
             'template' => 'order_overview.tpl',
             'block'    => 'admin_order_overview_send_form',
-            'file'     => 'views/blocks/pcp_admin_order_overview_send_form.tpl',
+            'file'     => 'views/admin/blocks/pcp_admin_order_overview_send_form.tpl',
+        ],
+        // === Frontend-Blocks (Twig für Apex) ===
+        [
+            'template' => 'page/checkout/payment.html.twig',
+            'block'    => 'select_payment',
+            'file'     => 'views/frontend/blocks/pcp_payment_select_override.html.twig',
+        ],
+        [
+            'template' => 'page/checkout/payment.html.twig',
+            'block'    => 'change_payment',
+            'file'     => 'views/frontend/blocks/pcp_change_payment.html.twig',
+        ],
+        [
+            'template' => 'page/checkout/thankyou.html.twig',
+            'block'    => 'checkout_thankyou_proceed',
+            'file'     => 'views/frontend/blocks/pcp_thankyou_checkout_thankyou.html.twig',
+        ],
+        [
+            'template' => 'page/checkout/thankyou.html.twig',
+            'block'    => 'checkout_thankyou_info',
+            'file'     => 'views/frontend/blocks/pcp_checkout_thankyou_info.html.twig',
+        ],
+        [
+            'template' => 'page/checkout/order.html.twig',
+            'block'    => 'checkout_order_address',
+            'file'     => 'views/frontend/blocks/pcp_checkout_order_address.html.twig',
+        ],
+        [
+            'template' => 'page/checkout/order.html.twig',
+            'block'    => 'checkout_order_btn_confirm_bottom',
+            'file'     => 'views/frontend/blocks/pcp_checkout_order_btn_confirm_bottom.html.twig',
+        ],
+        [
+            'template' => 'layout/base.html.twig',
+            'block'    => 'base_style',
+            'file'     => 'views/frontend/blocks/pcp_base_style.html.twig',
+        ],
+        [
+            'template' => 'layout/base.html.twig',
+            'block'    => 'base_js',
+            'file'     => 'views/frontend/blocks/pcp_base_js.html.twig',
+        ],
+        [
+            'template' => 'layout/header.html.twig',
+            'block'    => 'layout_header_logo',
+            'file'     => 'views/frontend/blocks/pcp_layout_header_logo.html.twig',
+        ],
+        [
+            'template' => 'page/shop/start.html.twig',
+            'block'    => 'start_bargain_articles',
+            'file'     => 'views/frontend/blocks/pcp_start_bargain_articles.html.twig',
+        ],
+        [
+            'template' => 'widget/header/categorylist.html.twig',
+            'block'    => 'dd_widget_header_categorylist',
+            'file'     => 'views/frontend/blocks/pcp_dd_widget_header_categorylist.html.twig',
+        ],
+        [
+            'template' => 'layout/footer.html.twig',
+            'block'    => 'dd_footer_manufacturerlist',
+            'file'     => 'views/frontend/blocks/pcp_dd_footer_manufacturerlist.html.twig',
+        ],
+        [
+            'template' => 'layout/footer.html.twig',
+            'block'    => 'dd_footer_categorytree',
+            'file'     => 'views/frontend/blocks/pcp_dd_footer_categorytree.html.twig',
         ],
     ],
     'settings' => [

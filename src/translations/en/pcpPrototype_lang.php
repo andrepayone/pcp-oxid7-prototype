@@ -1,0 +1,41 @@
+<?php
+$sLangName = "English";
+// -------------------------------
+// RESOURCE IDENTITFIER = STRING
+// -------------------------------
+$aLang = [
+    'PCP_DEMO_CREDITCARD'                   => 'Card type',
+    'PCP_DEMO_CC_NUMBER'                    => 'Credit Card Number',
+    'PCP_DEMO_CARD_SECURITY_CODE'           => 'Security Code',
+    'PCP_CC_CARDHOLDER'                     => 'Cord Holder',
+    'PCP_VALID_UNTIL'                       => 'Valid until',
+    'PCP_WILL_BE_DELIVERED_TO'              => 'Will be delivered to',
+    'PCP_CAN_BE_PICKED_UP_AT'               => 'Your Product is ready to be picked up at our PAYONE Seamless Commerce Store',
+    'PCP_TXID'                              => 'Transaction-ID',
+    'PCP_COMMERCE_CASE_ID'                  => 'Commercecase-ID',
+    'PCP_MERCHANT_REFERENCE'                => 'Merchant-Reference',
+    'PCP_CHECKOUT_REFERENCE'                => 'Checkout-Referenz',
+    'PCP_CHECKOUT_ID'                       => 'Checkout-ID',
+    'PCP_YOUR_PAYMENT_REFERENCE_DATA'       => 'Your payment reference data',
+    'PCP_DEMO_IBAN'                         => 'IBAN',
+    'PCP_DEBIT_ACCOUNTHOLDER'               => 'Accountholder',
+    'PCP_YOUR_CHOICE'                       => '<span style="color:#0096D6;font-weight: bold;">IHRE AUSWAHL</span><br><span style="color:#000;font-weight: bold;">ATTRAKTIVER PRODUKTE</span>',
+    'PCP_START_SUBTEXT'                     => 'Shopping mit gutem Gewissen: Es ist uns ein wichtiges Anliegen, dass all unsere angebotenen Produkte nachhaltige Projekte unterstützen.<br>So werden Lederreste aus Produktionsprozessen zu neuen hochwertigen Produkten aufgewertet statt vernichtet und unsere angebotene Schokolade ist aus fairer Herstellung.',
+    'PCP_MERCHANT_REFERENCE_ORDER'          => 'Reference of this order (Merchant Reference)',
+    'PCP_CHECKOUT_REFERENCE_ORDER'          => 'Checkout-Reference of this order (Checkout Reference)',
+    'PCP_BIRTHDATE'                         => 'Date of Birth',
+    'PCP_INSTALLMENT_PER_MONTH'             => 'per month',
+    'PCP_INSTALLMENT_RATES'                 => 'rates',
+    'PCP_LAST_INSTALLMENT_RATE'             => 'Last rate',
+    'PCP_INSTALLMENT_EFF_INTEREST_RATE'     => 'Effective interest rate',
+    'PCP_INSTALLMENT_NOM_INTEREST_RATE'     => 'Nominal interest rate',
+    'PCP_INSTALLMENT_TOTAL_AMOUNT'          => 'Total amount',
+    'PCP_INSTALLMENT_FIRST_RATE_DATE'       => 'Date of first rate',
+    'PCP_INSTALLMENT_INFO'                  => 'Download detailed information',
+    'PCP_INSTALLMENT_CHOOSE_OPTION'         => 'Choose installment option',
+    'PCP_CUSTOMER_IDENT'                    => 'Customer-ID',
+    'PCP_INSTALLMENT_ACCOUNT_DATA'          => 'Account Data',
+    'PAGE_TITLE_PCPINSTALLMENTCONTROLLER'   => 'Installment Details',
+    'PCP_MESSAGE_INSTALLMENT_PAYMENT'       => 'The selection of installment rates follow in next payment step.',
+    'PCP_MESSAGE_PAY_IN_STORE_PAYMENT'      => 'Reserve Online - Pay and Pickup in Store.',
+];
