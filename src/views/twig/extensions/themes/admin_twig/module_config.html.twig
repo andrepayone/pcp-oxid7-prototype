@@ -1,0 +1,33 @@
+{% extends 'module_config.html.twig' %}
+
+{% block admin_module_config_form %}
+    {% if pcpResultMessage %}
+        <div>
+            <b>{{ pcpResultMessage }}</b>
+        </div>
+        <hr id="pcp_setup_result_message">
+    {% endif %}
+
+    {% if isPcpDemoModule and showDemoShopButton %}
+        <div>
+            <input
+                type="submit"
+                class="confinput"
+                name="setup_demoshop"
+                value="{{ translate({ ident: "PCP_SETUP_DEMO_SHOP" }) }}"
+                onClick="triggerShopSetup()"
+                {{ readonly }}
+            >
+            <script>
+                function triggerShopSetup() {
+                    document.module_configuration.fnc.value='pcpSetupShop'
+                    const showDemoShopButton = document.getElementsByName('confbools[pcpShowDemoShopButton]');
+                    showDemoShopButton.checked = false;
+                }
+            </script>
+        </div>
+        <hr>
+    {% endif %}
+    {{ parent() }}
+{% endblock %}
+
