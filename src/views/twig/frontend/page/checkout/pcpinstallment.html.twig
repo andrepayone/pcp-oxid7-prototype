@@ -4,7 +4,7 @@
 
     {% include "page/checkout/inc/steps.html.twig" with {active: 3} %}
 
-    <script src="{{ oViewConf.getModuleUrl('PayonePcpPrototype', 'out/src/js/pcpinstallment.js') }}"></script>
+    <script src="{{ oViewConf.getModuleUrl('PayonePcpPrototype', 'js/pcpinstallment.js') }}"></script>
 
     <form action="{{ oViewConf.getSslSelfLink() }}" class="form-horizontal payment" id="pcpinstallment" name="order" method="post" novalidate="novalidate">
         <div class="hidden">

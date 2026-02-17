@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Ebene_1" data-name="Ebene 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 150">
+  <defs>
+    <style>
+      .cls-1 {
+        stroke-width: 2.47px;
+      }
+
+      .cls-1, .cls-2 {
+        fill: none;
+        stroke: #fff;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .cls-2 {
+        stroke-width: 4.09px;
+      }
+
+      .cls-3, .cls-4 {
+        stroke-width: 0px;
+      }
+
+      .cls-4 {
+        fill: #009cd9;
+      }
+    </style>
+  </defs>
+  <g>
+    <rect class="cls-4" x="0" y="0" width="150" height="150" rx="33.13" ry="33.13"/>
+    <g>
+      <rect class="cls-2" x="46.42" y="64.3" width="7.31" height="7.31"/>
+      <rect class="cls-2" x="70.18" y="64.3" width="7.31" height="7.31"/>
+      <rect class="cls-2" x="93.94" y="86.32" width="7.31" height="7.31"/>
+      <rect class="cls-2" x="46.42" y="86.32" width="7.31" height="7.31"/>
+      <rect class="cls-2" x="70.18" y="86.32" width="7.31" height="7.31"/>
+      <g>
+        <rect class="cls-2" x="31.79" y="40.54" width="84.09" height="73.12" rx="3.66" ry="3.66"/>
+        <line class="cls-2" x1="55.56" y1="29.57" x2="55.56" y2="47.85"/>
+        <line class="cls-2" x1="92.12" y1="29.57" x2="92.12" y2="47.85"/>
+      </g>
+      <g>
+        <line class="cls-2" x1="103.08" y1="63.38" x2="92.12" y2="74.35"/>
+        <line class="cls-2" x1="103.08" y1="74.35" x2="92.12" y2="63.38"/>
+      </g>
+    </g>
+  </g>
+  <g>
+    <path class="cls-3" d="M142.57,108.63c0,14.98-12.15,27.13-27.13,27.13s-27.13-12.15-27.13-27.13,12.15-27.13,27.13-27.13,27.13,12.15,27.13,27.13"/>
+    <g>
+      <path class="cls-1" d="M123.14,99.39l7.74-.54-.54-7.74M129.47,97.66s-1.64-1.43-2.14-1.86c-7.27-6.32-18.16-5.64-24.48,1.63-6.32,7.27-5.55,18.29,1.72,24.61,7.27,6.32,18.29,5.55,24.61-1.72"/>
+      <g>
+        <line class="cls-1" x1="113.19" y1="101.38" x2="113.19" y2="110.68"/>
+        <line class="cls-1" x1="121.02" y1="113.99" x2="113.19" y2="110.68"/>
+      </g>
+    </g>
+  </g>
+</svg>

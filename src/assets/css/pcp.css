@@ -1,0 +1,163 @@
+:root {
+    --pcp-primary-color: #0096d6;
+    --pcp-secondary-color-bright: #87cdec;
+    --pcp-secondary-color-dark: #005a80;
+    --pcp-tertiary-color-1: #00bcd4;
+    --pcp-danger-color: #f50057;
+    --pcp-warning-color: #8bc34a;
+    --pcp-black-color: #0d0d0d;
+}
+
+
+.btn-primary {
+    color: #fff;
+    background-color: var(--pcp-primary-color) !important;
+    border-color: var(--pcp-secondary-color-dark) !important;
+}
+
+.btn-danger {
+    color: #fff;
+    background-color: var(--pcp-danger-color) !important;
+    border-color: var(--pcp-black-color) !important;
+}
+
+.btn-danger:hover {
+    color: #fff;
+    background-color: var(--pcp-danger-color) !important;
+    border-color: var(--pcp-black-color) !important;
+}
+
+.btn-warning {
+    color: #fff;
+    background-color: var(--pcp-warning-color) !important;
+    border-color: var(--pcp-black-color) !important;
+}
+
+.btn-warning:hover {
+    color: #fff;
+    background-color: var(--pcp-warning-color) !important;
+    border-color: var(--pcp-black-color) !important;
+}
+
+
+body.cl-thankyou ol.checkoutSteps li.active .num, body.is-checkout ol.checkoutSteps li.active .num {
+    background-color: var(--pcp-tertiary-color-1) !important;
+    color: #FFF !important;
+}
+
+body.cl-thankyou ol.checkoutSteps li.passed .num, body.is-checkout ol.checkoutSteps li.passed .num {
+    background-color: var(--pcp-secondary-color-bright) !important;
+    color: #FFF !important;
+}
+
+body.cl-thankyou ol.checkoutSteps, body.is-checkout ol.checkoutSteps {
+    border-top: 3px solid var(--pcp-primary-color) !important;
+    width: 100%;
+    height: 40px;
+    display: block;
+    padding: 0;
+    margin: 11px 0 0 0;
+}
+
+.breadcrumb>.active a {
+    color: var(--pcp-primary-color) !important;
+}
+
+body.cl-details .details-col-right .action-links a {
+    color: var(--pcp-primary-color) !important;
+    font-size: 12px;
+}
+
+body.cl-details #detailsItemsPager .pager-overview-link, body.cl-details #detailsItemsPager .pager-prev, body.cl-details #detailsItemsPager .pager-next, body.cl-details #detailsItemsPager .pager-overview-link a, body.cl-details #detailsItemsPager .pager-prev a, body.cl-details #detailsItemsPager .pager-next a {
+    color: var(--pcp-primary-color) !important;
+}
+
+.alert-info {
+    background-color: var(--pcp-secondary-color-bright) !important;
+    border-color: var(--pcp-primary-color) !important;
+    color: var(--pcp-secondary-color-dark) !important;
+}
+
+#jumptotop {
+    position: fixed;
+    display: block;
+    right: 35px;
+    bottom: 40px;
+    color: var(--pcp-primary-color) !important;
+    font-size: 45px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .3s,visibility 0s linear .3s;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    cursor: pointer;
+    z-index: 1000;
+}
+
+body.cl-thankyou ol.checkoutSteps li .num, body.is-checkout ol.checkoutSteps li .num {
+    border: 2px solid #FFF;
+    border-radius: 50%;
+    color: var(--pcp-primary-color) !important;
+    width: 30px;
+    height: 30px;
+    padding-top: 1px;
+    margin-left: -16px;
+    position: absolute;
+    top: -16px;
+    left: 50%;
+    font-size: 16px;
+    font-weight: 500;
+    text-align: center;
+}
+
+body.cl-thankyou ol.checkoutSteps li .num, body.is-checkout ol.checkoutSteps li .num {
+    border: 2px solid #FFF;
+    border-radius: 50%;
+    background-color: var(--pcp-primary-color) !important;
+    width: 30px;
+    height: 30px;
+    padding-top: 1px;
+    margin-left: -16px;
+    position: absolute;
+    top: -16px;
+    left: 50%;
+    color: #FFF !important;
+    font-size: 16px;
+    font-weight: 500;
+    text-align: center;
+}
+
+.dropdown-menu>.active>a, .dropdown-menu>.active>a:hover, .dropdown-menu>.active>a:focus {
+    color: #fff;
+    text-decoration: none;
+    outline: 0;
+    background-color: var(--pcp-primary-color) !important;
+}
+
+#header .minibasket-menu table .badge {
+    background-color:var(--pcp-primary-color) !important;
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    font-weight: 500;
+}
+
+form#pcpinstallment .panel-body>dl {
+    min-height: 20px;
+    margin-bottom: 20px;
+    background-color: #f5f5f5;
+    border: 1px solid #e3e3e3;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,0.05);
+    padding: 9px;
+    border-radius: 3px;
+}
+
+form#pcpinstallment dd.activeInstallment {
+    display: block;
+    margin-top: 10px;
+}
+
+form#pcpinstallment dd {
+    display: none;
+}
