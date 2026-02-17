@@ -3,14 +3,14 @@
     <OXMENU id="NAVIGATION_ESHOPADMIN">
         <MAINMENU id="mxextensions">
             <SUBMENU id="mxmodule" cl="module" list="module_list">
-                <TAB id="PCP_UPLOAD" cl="ConfigUploadController" />
+                <TAB id="PCP_UPLOAD" cl="PcpConfigUploadController" />
             </SUBMENU>
         </MAINMENU>
     </OXMENU>
     <OXMENU id="PCP_ADMIN_TITLE">
         <MAINMENU id="PCP_PROTOCOLS">
-            <SUBMENU id="PCP_API_LOG" cl="ApiLogMainController" list="pcpapilog_list_controller">
-                <TAB id="PCP_API_LOG" cl="ApiLogController" />
+            <SUBMENU id="PCP_API_LOG" cl="PcpApiLogMainController" list="PcpApiLogListController">
+                <TAB id="PCP_API_LOG" cl="PcpApiLogController" />
             </SUBMENU>
         </MAINMENU>
     </OXMENU>

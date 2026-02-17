@@ -25,7 +25,7 @@ class PaymentController extends PaymentController_parent
         $sPaymentId = $this->getCheckedPaymentId();
 
         if ($result === 'order' && Payment::isPcpInstallment($sPaymentId)) {
-            return 'pcpinstallmentcontroller';
+            return 'PcpInstallmentController';
         }
 
         return $result;
