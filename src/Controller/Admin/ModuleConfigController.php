@@ -7,6 +7,7 @@ namespace Payone\PcpPrototype\Controller\Admin;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
+use Payone\PcpPrototype\Core\ViewConfig;
 use Payone\PcpPrototype\Model\Payment;
 
 class ModuleConfigController extends ModuleConfigController_parent
@@ -415,8 +416,8 @@ class ModuleConfigController extends ModuleConfigController_parent
 
     protected function copyArticleDemoPictures(): void
     {
-        $sModulesDir = Registry::getConfig()->getModulesDir();
-        $sSourcePath = $sModulesDir . 'Payone/PcpPrototype/out/pictures/products';
+        $sModuleDir = Registry::get(ViewConfig::class)->getModulePath('PayonePcpPrototype');
+        $sSourcePath = $sModuleDir . 'out/pictures/products';
         $sTargetPath = Registry::getConfig()->getConfigParam('sShopDir') . 'out/pictures/master/product';
 
         foreach (self::$aProductPictures as $sPic) {
@@ -439,9 +440,9 @@ class ModuleConfigController extends ModuleConfigController_parent
 
     protected function copyFavIcon(): void
     {
-        $sModulesDir = Registry::getConfig()->getModulesDir();
-        $sSrcFile = $sModulesDir . 'Payone/PcpPrototype/out/img/favicon.ico';
-        $sTgtFile = Registry::getConfig()->getConfigParam('sShopDir') . 'out/flow/img/favicons/favicon.ico';
+        $sModuleDir = Registry::get(ViewConfig::class)->getModulePath('PayonePcpPrototype');
+        $sSrcFile = $sModuleDir . 'out/img/favicon.ico';
+        $sTgtFile = Registry::getConfig()->getConfigParam('sShopDir') . 'out/apex/img/favicons/favicon.ico';
 
         if (file_exists($sSrcFile)) {
             if (!file_exists(dirname($sTgtFile))) {

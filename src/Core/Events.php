@@ -82,15 +82,7 @@ class Events
 
     public static function clearTmp(): void
     {
-        $sTmpDir = Registry::getConfig()->getConfigParam('sShopDir') . '/tmp/';
-        $sSmartyDir = $sTmpDir . 'smarty/';
-
-        foreach (glob($sTmpDir . '*.txt') as $sFileName) {
-            @unlink($sFileName);
-        }
-        foreach (glob($sSmartyDir . '*.php') as $sFileName) {
-            @unlink($sFileName);
-        }
+        $output = shell_exec(VENDOR_PATH . '/bin/oe-console oe:cache:clear');
     }
 
     public static function preparePromotions(): void
