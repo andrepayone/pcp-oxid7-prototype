@@ -66,6 +66,6 @@ class ViewConfig extends ViewConfig_parent
             }
         }
 
-        return $this->getModuleUrl('PayonePcpPrototype', 'assets/img/payone_logo.png');
+        return $this->getModuleUrl('PayonePcpPrototype', 'img/payone_logo.png');
     }
 }
