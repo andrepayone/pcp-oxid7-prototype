@@ -128,8 +128,8 @@ class Events
 
     public static function copyBanners(array $aFilesToCopy): void
     {
-        $sModulesDir = Registry::getConfig()->getModulesDir();
-        $sPromoPathPlugin = $sModulesDir . 'Payone/PcpPrototype/out/pictures/promo';
+        $sModuleDir = Registry::get(ViewConfig::class)->getModulePath('PayonePcpPrototype');
+        $sPromoPathPlugin = $sModuleDir . 'out/pictures/promo';
         $sPromoPathShop = Registry::getConfig()->getConfigParam('sShopDir') . 'out/pictures/promo';
 
         foreach ($aFilesToCopy as $sFileName) {
