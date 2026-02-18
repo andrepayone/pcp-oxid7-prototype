@@ -8,35 +8,28 @@
     --pcp-black-color: #0d0d0d;
 }
 
+.btn {
+    color: var(--pcp-primary-color) !important;
+}
 
 .btn-primary {
-    color: #fff;
-    background-color: var(--pcp-primary-color) !important;
-    border-color: var(--pcp-secondary-color-dark) !important;
+    color: var(--pcp-primary-color) !important;
 }
 
 .btn-danger {
-    color: #fff;
-    background-color: var(--pcp-danger-color) !important;
-    border-color: var(--pcp-black-color) !important;
+    color: var(--pcp-danger-color) !important;
 }
 
 .btn-danger:hover {
-    color: #fff;
-    background-color: var(--pcp-danger-color) !important;
-    border-color: var(--pcp-black-color) !important;
+    color: var(--pcp-danger-color) !important;
 }
 
 .btn-warning {
-    color: #fff;
-    background-color: var(--pcp-warning-color) !important;
-    border-color: var(--pcp-black-color) !important;
+    color: var(--pcp-warning-color) !important;
 }
 
 .btn-warning:hover {
-    color: #fff;
-    background-color: var(--pcp-warning-color) !important;
-    border-color: var(--pcp-black-color) !important;
+    color: var(--pcp-warning-color) !important;
 }
 
 
