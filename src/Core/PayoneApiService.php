@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Payone\PcpPrototype\Core;
 
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleConfigurationDaoBridgeInterface;
+use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use PayoneCommercePlatform\Sdk\CommunicatorConfiguration;
 use PayoneCommercePlatform\Sdk\ApiClient\CheckoutApiClient;
 use PayoneCommercePlatform\Sdk\ApiClient\CommerceCaseApiClient;
@@ -52,13 +54,12 @@ class PayoneApiService
 
     public function __construct()
     {
-        $oConfig = Registry::getConfig();
-        $this->merchantId = $oConfig->getConfigParam('pcpMerchantId');
+        $this->merchantId = $this->pcpGetShopConfVar('pcpMerchantId');
 
         $this->config = new CommunicatorConfiguration(
-            apiKey: $oConfig->getConfigParam('pcpApiKey'),
-            apiSecret: $oConfig->getConfigParam('pcpApiSecret'),
-            host: $oConfig->getConfigParam('pcpApiEndpoint'),
+            apiKey: $this->pcpGetShopConfVar('pcpApiKey'),
+            apiSecret: $this->pcpGetShopConfVar('pcpApiSecret'),
+            host: $this->pcpGetShopConfVar('pcpApiEndpoint'),
         );
 
         $this->commerceCaseClient = new CommerceCaseApiClient($this->config);
@@ -476,5 +477,22 @@ class PayoneApiService
     public function generateReference(string $sPrefix = 'dm'): string
     {
         return $sPrefix . date('YmdHis');
+    }
+
+    /**
+     * Returns config value
+     *
+     * @param  string $sVarName
+     * @return mixed|false
+     */
+    public function pcpGetShopConfVar($sVarName)
+    {
+        $container = ContainerFactory::getInstance()->getContainer();
+        $moduleConfiguration =
+            $container->get(ModuleConfigurationDaoBridgeInterface::class)->get("PayonePcpPrototype");
+        if (!$moduleConfiguration->hasModuleSetting($sVarName)) {
+            return false;
+        }
+        return $moduleConfiguration->getModuleSetting($sVarName)->getValue();
     }
 }

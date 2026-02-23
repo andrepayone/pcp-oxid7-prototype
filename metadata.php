@@ -18,28 +18,17 @@ $aModule = [
     'email' => 'integrations@payone.com',
     'url' => 'https://docs.payone.com/pcp/payone-commerce-platform',
     'extend' => [
-        \OxidEsales\Eshop\Core\ViewConfig::class
-        => \Payone\PcpPrototype\Core\ViewConfig::class,
-        \OxidEsales\Eshop\Application\Controller\Admin\ModuleConfiguration::class
-        => \Payone\PcpPrototype\Controller\Admin\ModuleConfigController::class,
-        \OxidEsales\Eshop\Application\Controller\Admin\OrderOverview::class
-        => \Payone\PcpPrototype\Controller\Admin\OrderOverviewController::class,
-        \OxidEsales\Eshop\Application\Controller\PaymentController::class
-        => \Payone\PcpPrototype\Controller\PaymentController::class,
-        \OxidEsales\Eshop\Application\Controller\OrderController::class
-        => \Payone\PcpPrototype\Controller\OrderController::class,
-        \OxidEsales\Eshop\Application\Controller\ThankYouController::class
-        => \Payone\PcpPrototype\Controller\ThankyouController::class,
-        \OxidEsales\Eshop\Application\Controller\AccountUserController::class
-        => \Payone\PcpPrototype\Controller\AccountUserController::class,
-        \OxidEsales\Eshop\Application\Controller\UserController::class
-        => \Payone\PcpPrototype\Controller\UserController::class,
-        \OxidEsales\Eshop\Application\Model\Order::class
-        => \Payone\PcpPrototype\Model\Order::class,
-        \OxidEsales\Eshop\Application\Model\Payment::class
-        => \Payone\PcpPrototype\Model\Payment::class,
-        \OxidEsales\Eshop\Application\Model\PaymentGateway::class
-        => \Payone\PcpPrototype\Model\PaymentGateway::class,
+        \OxidEsales\Eshop\Core\ViewConfig::class => \Payone\PcpPrototype\Core\ViewConfig::class,
+        \OxidEsales\Eshop\Application\Controller\Admin\ModuleConfiguration::class => \Payone\PcpPrototype\Controller\Admin\ModuleConfigController::class,
+        \OxidEsales\Eshop\Application\Controller\Admin\OrderOverview::class => \Payone\PcpPrototype\Controller\Admin\OrderOverviewController::class,
+        \OxidEsales\Eshop\Application\Controller\PaymentController::class => \Payone\PcpPrototype\Controller\PaymentController::class,
+        \OxidEsales\Eshop\Application\Controller\OrderController::class => \Payone\PcpPrototype\Controller\OrderController::class,
+        \OxidEsales\Eshop\Application\Controller\ThankYouController::class => \Payone\PcpPrototype\Controller\ThankyouController::class,
+        \OxidEsales\Eshop\Application\Controller\AccountUserController::class => \Payone\PcpPrototype\Controller\AccountUserController::class,
+        \OxidEsales\Eshop\Application\Controller\UserController::class => \Payone\PcpPrototype\Controller\UserController::class,
+        \OxidEsales\Eshop\Application\Model\Order::class => \Payone\PcpPrototype\Model\Order::class,
+        \OxidEsales\Eshop\Application\Model\Payment::class => \Payone\PcpPrototype\Model\Payment::class,
+        \OxidEsales\Eshop\Application\Model\PaymentGateway::class => \Payone\PcpPrototype\Model\PaymentGateway::class,
     ],
     'controllers' => [
         'PcpInstallmentController'  => \Payone\PcpPrototype\Controller\InstallmentController::class,
