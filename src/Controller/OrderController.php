@@ -85,11 +85,11 @@ class OrderController extends OrderController_parent
 
     public function execute()
     {
-        if (!$this->getSession()->checkSessionChallenge()) {
+        if (!Registry::getSession()->checkSessionChallenge()) {
             return;
         }
 
-        if (!$this->_validateTermsAndConditions()) {
+        if (!$this->validateTermsAndConditions()) {
             $this->_blConfirmAGBError = 1;
             return;
         }
@@ -100,19 +100,17 @@ class OrderController extends OrderController_parent
         }
 
         if ($this->isPcpPayment()) {
-            $oSession = Registry::getSession();
-
             $sMerchantReference = (string) Registry::getRequest()->getRequestParameter('pcp_merchant_reference');
             $sCheckoutReference = (string) Registry::getRequest()->getRequestParameter('pcp_checkout_reference');
 
             if ($sMerchantReference) {
-                $oSession->setVariable('pcp_merchant_reference', $sMerchantReference);
+                Registry::getSession()->setVariable('pcp_merchant_reference', $sMerchantReference);
             }
             if ($sCheckoutReference) {
-                $oSession->setVariable('pcp_checkout_reference', $sCheckoutReference);
+                Registry::getSession()->setVariable('pcp_checkout_reference', $sCheckoutReference);
             }
 
-            $oSession->setVariable('pcp_is_store_shipping', $this->pcpIsStoreShipping());
+            Registry::getSession()->setVariable('pcp_is_store_shipping', $this->pcpIsStoreShipping());
         }
 
         return parent::execute();

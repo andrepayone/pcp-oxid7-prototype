@@ -56,68 +56,69 @@
                                                 <label class="form-check-label"
                                                        for="payment_{{ sPaymentID }}">{{ paymentmethod.oxpayments__oxdesc.value }}</label>
                                                 <div class="payment-option-info{% if oView.getCheckedPaymentId() == paymentmethod.oxpayments__oxid.value %} activePayment{% endif %}">
-                                                    <div>
-                                                        <img
-                                                            src="{{ oViewConf.getModuleUrl('PayonePcpPrototype', 'img/visa_logo.png') }}"
-                                                            alt="{{ translate({ ident: "PCP_DEMO_CREDITCARD" }) }}"
-                                                            style="max-width: 200px;"
-                                                        >
-                                                    </div>
-
-                                                    <div class="form-floating mb-3">
-                                                        <select id="{{ sPaymentID }}_cctype" name="dynvalue[pcp_demo_cctype]" class="form-select" disabled>
-                                                            <option value="pcp_demo_visa" selected>Visa</option>
-                                                            <option value="pcp_demo_mastercard">Mastercard</option>
-                                                        </select>
-                                                        <label for="{{ sPaymentID }}_cctype">{{ translate({ ident: "PCP_DEMO_CREDITCARD" }) }}</label>
-                                                    </div>
-                                                    <div class="form-floating mb-3">
-                                                        <input id="{{ sPaymentID }}_ccnumber" placeholder="{{ translate({ ident: 'PCP_DEMO_CC_NUMBER' }) }}" autocomplete="off" type="text" class="form-control" size="20" maxlength="64" name="dynvalue[pcp_demo_ccnumber]" value="4716971940353559" disabled>
-                                                        <label for="{{ sPaymentID }}_ccnumber">{{ translate({ ident: "PCP_DEMO_CC_NUMBER" }) }}</label>
-                                                    </div>
-                                                    <div class="form-floating mb-3">
-                                                        <input id="{{ sPaymentID }}_cccardholder" placeholder="{{ translate({ ident: 'PCP_CC_CARDHOLDER' }) }}" autocomplete="off" type="text" class="form-control" size="20" maxlength="64" name="dynvalue[pcp_demo_ccholder]" value="{{ oView.pcpGetCardHolder() }}" disabled>
-                                                        <label for="{{ sPaymentID }}_cccardholder">{{ translate({ ident: "PCP_CC_CARDHOLDER" }) }}</label>
-                                                    </div>
-                                                    <div class="form-floating mb-3">
-                                                        <div class="col-12">{{ translate({ ident: "PCP_VALID_UNTIL" }) }}:</div>
-                                                        <div class="col-6">
-                                                            <select id="{{ sPaymentID }}_ccmonth" name="dynvalue[pcp_demo_ccmonth]" class="form-select" disabled>
-                                                                {% for m in ['01','02','03','04','05','06','07','08','09','10','11','12'] %}
-                                                                    <option {{ m == '07' ? 'selected' : '' }}>{{ m }}</option>
-                                                                {% endfor %}
-                                                            </select>
-                                                            <label for="{{ sPaymentID }}_ccmonth">{{ translate({ ident: "PCP_VALID_UNTIL_MONTH" }) }}</label>
+                                                    <div class="pcp-payment-content">
+                                                        <div>
+                                                            <img
+                                                                src="{{ oViewConf.getModuleUrl('PayonePcpPrototype', 'img/visa_logo.png') }}"
+                                                                alt="{{ translate({ ident: "PCP_DEMO_CREDITCARD" }) }}"
+                                                                style="max-width: 200px;margin-bottom: 20px;"
+                                                            >
                                                         </div>
-                                                        <div class="col-6">
-                                                            <select id="{{ sPaymentID }}_ccyear" name="dynvalue[pcp_demo_ccyear]" class="form-select" disabled>
-                                                                {% for y in ['2024','2025','2026','2027','2028'] %}
-                                                                    <option {{ y == '2027' ? 'selected' : '' }}>{{ y }}</option>
-                                                                {% endfor %}
+                                                        <div class="form-floating mb-3">
+                                                            <select id="{{ sPaymentID }}_cctype" name="dynvalue[pcp_demo_cctype]" class="form-select" disabled>
+                                                                <option value="pcp_demo_visa" selected>Visa</option>
+                                                                <option value="pcp_demo_mastercard">Mastercard</option>
                                                             </select>
-                                                            <label for="{{ sPaymentID }}_ccyear">{{ translate({ ident: "PCP_VALID_UNTIL_YEAR" }) }}</label>
+                                                            <label for="{{ sPaymentID }}_cctype">{{ translate({ ident: "PCP_DEMO_CREDITCARD" }) }}</label>
                                                         </div>
-                                                    </div>
-                                                    <div class="form-floating mb-3">
-                                                        <input id="{{ sPaymentID }}_cccheck" placeholder="{{ translate({ ident: 'PCP_DEMO_CARD_SECURITY_CODE' }) }}" autocomplete="off" type="text" class="form-control" size="20" maxlength="64" name="dynvalue[pcp_demo_cccheck]" value="123" disabled>
-                                                        <label for="{{ sPaymentID }}_cccheck">{{ translate({ ident: "PCP_DEMO_CARD_SECURITY_CODE" }) }}:</label>
+                                                        <div class="form-floating mb-3">
+                                                            <input id="{{ sPaymentID }}_ccnumber" placeholder="{{ translate({ ident: 'PCP_DEMO_CC_NUMBER' }) }}" autocomplete="off" type="text" class="form-control" size="20" maxlength="64" name="dynvalue[pcp_demo_ccnumber]" value="4716971940353559" disabled>
+                                                            <label for="{{ sPaymentID }}_ccnumber">{{ translate({ ident: "PCP_DEMO_CC_NUMBER" }) }}</label>
+                                                        </div>
+                                                        <div class="form-floating mb-3">
+                                                            <input id="{{ sPaymentID }}_cccardholder" placeholder="{{ translate({ ident: 'PCP_CC_CARDHOLDER' }) }}" autocomplete="off" type="text" class="form-control" size="20" maxlength="64" name="dynvalue[pcp_demo_ccholder]" value="{{ oView.pcpGetCardHolder() }}" disabled>
+                                                            <label for="{{ sPaymentID }}_cccardholder">{{ translate({ ident: "PCP_CC_CARDHOLDER" }) }}</label>
+                                                        </div>
+                                                        <div class="form-floating mb-3">
+                                                            <div class="col-12">{{ translate({ ident: "PCP_VALID_UNTIL" }) }}:</div>
+                                                            <div class="col-6">
+                                                                <select id="{{ sPaymentID }}_ccmonth" name="dynvalue[pcp_demo_ccmonth]" class="form-select" disabled>
+                                                                    {% for m in ['01','02','03','04','05','06','07','08','09','10','11','12'] %}
+                                                                        <option {{ m == '07' ? 'selected' : '' }}>{{ m }}</option>
+                                                                    {% endfor %}
+                                                                </select>
+                                                                <label for="{{ sPaymentID }}_ccmonth">{{ translate({ ident: "PCP_VALID_UNTIL_MONTH" }) }}</label>
+                                                            </div>
+                                                            <div class="col-6">
+                                                                <select id="{{ sPaymentID }}_ccyear" name="dynvalue[pcp_demo_ccyear]" class="form-select" disabled>
+                                                                    {% for y in ['2024','2025','2026','2027','2028'] %}
+                                                                        <option {{ y == '2027' ? 'selected' : '' }}>{{ y }}</option>
+                                                                    {% endfor %}
+                                                                </select>
+                                                                <label for="{{ sPaymentID }}_ccyear">{{ translate({ ident: "PCP_VALID_UNTIL_YEAR" }) }}</label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-floating mb-3">
+                                                            <input id="{{ sPaymentID }}_cccheck" placeholder="{{ translate({ ident: 'PCP_DEMO_CARD_SECURITY_CODE' }) }}" autocomplete="off" type="text" class="form-control" size="20" maxlength="64" name="dynvalue[pcp_demo_cccheck]" value="123" disabled>
+                                                            <label for="{{ sPaymentID }}_cccheck">{{ translate({ ident: "PCP_DEMO_CARD_SECURITY_CODE" }) }}:</label>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     {% elseif sPaymentID == "pcpsecuredebit" %}
-                                        <div class="payment-option">
-                                            <div class="payment-option-form">
-                                                <input class="form-check-input" id="payment_{{ sPaymentID }}" type="radio" name="paymentid"
-                                                       value="{{ sPaymentID }}"{% if oView.getCheckedPaymentId() == paymentmethod.oxpayments__oxid.value %} checked{% endif %}>
-                                                <label class="form-check-label"
-                                                       for="payment_{{ sPaymentID }}">{{ paymentmethod.oxpayments__oxdesc.value }}</label>
-                                                <div class="payment-option-info{% if oView.getCheckedPaymentId() == paymentmethod.oxpayments__oxid.value %} activePayment{% endif %}">
+                                        <div class="payment-option-form">
+                                            <input class="form-check-input" id="payment_{{ sPaymentID }}" type="radio" name="paymentid"
+                                                   value="{{ sPaymentID }}"{% if oView.getCheckedPaymentId() == paymentmethod.oxpayments__oxid.value %} checked{% endif %}>
+                                            <label class="form-check-label"
+                                                   for="payment_{{ sPaymentID }}">{{ paymentmethod.oxpayments__oxdesc.value }}</label>
+                                            <div class="payment-option-info{% if oView.getCheckedPaymentId() == paymentmethod.oxpayments__oxid.value %} activePayment{% endif %}">
+                                                <div class="pcp-payment-content">
                                                     <div>
                                                         <img
-                                                            src="{{ oViewConf.getModuleUrl('PayonePcpPrototype', 'img/Zahlungsmethode_Lastschrift.png') }}"
-                                                            alt="Direct Debit"
-                                                            style="max-width: 200px;"
+                                                                src="{{ oViewConf.getModuleUrl('PayonePcpPrototype', 'img/Zahlungsmethode_Lastschrift.png') }}"
+                                                                alt="Direct Debit"
+                                                                style="max-width: 200px;margin-bottom: 20px;"
                                                         >
                                                     </div>
 
@@ -140,33 +141,36 @@
                                                 <label class="form-check-label"
                                                        for="payment_{{ sPaymentID }}">{{ paymentmethod.oxpayments__oxdesc.value }}</label>
                                                 <div class="payment-option-info{% if oView.getCheckedPaymentId() == paymentmethod.oxpayments__oxid.value %} activePayment{% endif %}">
-                                                    <div>
+                                                    <div class="pcp-payment-content">
                                                         <img
                                                             src="{{ oViewConf.getModuleUrl('PayonePcpPrototype', 'img/paypal.png') }}"
                                                             alt="PayPal"
-                                                            style="max-width: 200px;"
+                                                            style="max-width: 200px;margin-bottom: 20px;"
                                                         >
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
+
                                     {% elseif sPaymentID == "pcpsecureinstallment" %}
                                         <div class="payment-option">
-                                            <div class="payment-option-form">
-                                                <input class="form-check-input" id="payment_{{ sPaymentID }}" type="radio" name="paymentid"
-                                                       value="{{ sPaymentID }}"{% if oView.getCheckedPaymentId() == paymentmethod.oxpayments__oxid.value %} checked{% endif %}>
-                                                <label class="form-check-label"
-                                                       for="payment_{{ sPaymentID }}">{{ paymentmethod.oxpayments__oxdesc.value }}</label>
-                                                <div class="payment-option-info{% if oView.getCheckedPaymentId() == paymentmethod.oxpayments__oxid.value %} activePayment{% endif %}">
-                                                    <div>
-                                                        <img
-                                                                src="{{ oViewConf.getModuleUrl('PayonePcpPrototype', 'img/zahlungsmethode_ratenkauf.png') }}"
-                                                                alt="{{ translate({ ident: "PCP_MESSAGE_INSTALLMENT_PAYMENT" }) }}"
-                                                                style="max-width: 200px;"
-                                                        >
-                                                    </div>
-                                                    <div class="desc">
-                                                        <i>{{ translate({ ident: "PCP_MESSAGE_INSTALLMENT_PAYMENT" }) }}</i>
+                                            <div class="pcp-payment-content">
+                                                <div class="payment-option-form">
+                                                    <input class="form-check-input" id="payment_{{ sPaymentID }}" type="radio" name="paymentid"
+                                                           value="{{ sPaymentID }}"{% if oView.getCheckedPaymentId() == paymentmethod.oxpayments__oxid.value %} checked{% endif %}>
+                                                    <label class="form-check-label"
+                                                           for="payment_{{ sPaymentID }}">{{ paymentmethod.oxpayments__oxdesc.value }}</label>
+                                                    <div class="payment-option-info{% if oView.getCheckedPaymentId() == paymentmethod.oxpayments__oxid.value %} activePayment{% endif %}">
+                                                        <div>
+                                                            <img
+                                                                    src="{{ oViewConf.getModuleUrl('PayonePcpPrototype', 'img/zahlungsmethode_ratenkauf.png') }}"
+                                                                    alt="{{ translate({ ident: "PCP_MESSAGE_INSTALLMENT_PAYMENT" }) }}"
+                                                                    style="max-width: 200px;margin-bottom: 20px;"
+                                                            >
+                                                        </div>
+                                                        <div class="desc">
+                                                            <i>{{ translate({ ident: "PCP_MESSAGE_INSTALLMENT_PAYMENT" }) }}</i>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -179,14 +183,16 @@
                                                 <label class="form-check-label"
                                                        for="payment_{{ sPaymentID }}">{{ paymentmethod.oxpayments__oxdesc.value }}</label>
                                                 <div class="payment-option-info{% if oView.getCheckedPaymentId() == paymentmethod.oxpayments__oxid.value %} activePayment{% endif %}">
-                                                    <div>
-                                                        <img
-                                                            src="{{ oViewConf.getModuleUrl('PayonePcpPrototype', 'img/pick_up_in_store.png') }}"
-                                                            alt="{{ translate({ ident: "PCP_MESSAGE_PAY_IN_STORE_PAYMENT" }) }}"
-                                                        >
-                                                    </div>
-                                                    <div class="desc">
-                                                        <i>{{ translate({ ident: "PCP_MESSAGE_PAY_IN_STORE_PAYMENT" }) }}</i>
+                                                    <div class="pcp-payment-content">
+                                                        <div>
+                                                            <img
+                                                                src="{{ oViewConf.getModuleUrl('PayonePcpPrototype', 'img/pick_up_in_store.png') }}"
+                                                                alt="{{ translate({ ident: "PCP_MESSAGE_PAY_IN_STORE_PAYMENT" }) }}"
+                                                            >
+                                                        </div>
+                                                        <div class="desc">
+                                                            <i>{{ translate({ ident: "PCP_MESSAGE_PAY_IN_STORE_PAYMENT" }) }}</i>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>

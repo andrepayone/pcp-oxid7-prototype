@@ -154,3 +154,8 @@ form#pcpinstallment dd.activeInstallment {
 form#pcpinstallment dd {
     display: none;
 }
+
+.pcp-payment-content {
+    margin-left: 20px;
+    margin-top: 10px;
+}
