@@ -8,8 +8,8 @@
 
     <form action="{{ oViewConf.getSslSelfLink() }}" class="form-horizontal payment" id="pcpinstallment" name="order" method="post" novalidate="novalidate">
         <div class="hidden">
-            {{ oViewConf.getHiddenSid() }}
-            {{ oViewConf.getNavFormParams() }}
+            {{ oViewConf.getHiddenSid()|raw }}
+            {{ oViewConf.getNavFormParams()|raw }}
             <input type="hidden" name="cl" value="order">
             <input type="hidden" name="fnc" value="init">
         </div>

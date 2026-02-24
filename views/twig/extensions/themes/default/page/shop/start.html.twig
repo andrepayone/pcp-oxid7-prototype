@@ -3,14 +3,14 @@
 {% block start_bargain_articles %}
     {% set oBargainArticles = oView.getBargainArticleList() %}
     {% if oBargainArticles and oBargainArticles|length > 0 %}
-        {% include "widget/product/list.html.twig" with {
-            type: oViewConf.getViewThemeParam("sStartPageListDisplayType"),
-            head: translate({ ident: "PCP_YOUR_CHOICE" }),
-            subhead: translate({ ident: "PCP_START_SUBTEXT" }),
-            listId: "bargainItems",
-            products: oBargainArticles,
-            showMainLink: true,
-            iProductsPerLine: 4
-        } %}
+        <div class="d-flex flex-column row-spacer justify-content-between align-items-center">
+            {% include "widget/product/list.html.twig" with {
+                type: oViewConf.getViewThemeParam("sStartPageListDisplayType"),
+                listId: "bargainItems",
+                products: oBargainArticles,
+                showMainLink: true,
+                iProductsPerLine: 4
+            } %}
+        </div>
     {% endif %}
 {% endblock %}

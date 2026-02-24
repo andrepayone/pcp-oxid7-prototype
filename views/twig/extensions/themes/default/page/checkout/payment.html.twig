@@ -107,28 +107,30 @@
                                             </div>
                                         </div>
                                     {% elseif sPaymentID == "pcpsecuredebit" %}
-                                        <div class="payment-option-form">
-                                            <input class="form-check-input" id="payment_{{ sPaymentID }}" type="radio" name="paymentid"
-                                                   value="{{ sPaymentID }}"{% if oView.getCheckedPaymentId() == paymentmethod.oxpayments__oxid.value %} checked{% endif %}>
-                                            <label class="form-check-label"
-                                                   for="payment_{{ sPaymentID }}">{{ paymentmethod.oxpayments__oxdesc.value }}</label>
-                                            <div class="payment-option-info{% if oView.getCheckedPaymentId() == paymentmethod.oxpayments__oxid.value %} activePayment{% endif %}">
-                                                <div class="pcp-payment-content">
-                                                    <div>
-                                                        <img
-                                                                src="{{ oViewConf.getModuleUrl('PayonePcpPrototype', 'img/Zahlungsmethode_Lastschrift.png') }}"
-                                                                alt="Direct Debit"
-                                                                style="max-width: 200px;margin-bottom: 20px;"
-                                                        >
-                                                    </div>
+                                        <div class="payment-option">
+                                            <div class="payment-option-form">
+                                                <input class="form-check-input" id="payment_{{ sPaymentID }}" type="radio" name="paymentid"
+                                                       value="{{ sPaymentID }}"{% if oView.getCheckedPaymentId() == paymentmethod.oxpayments__oxid.value %} checked{% endif %}>
+                                                <label class="form-check-label"
+                                                       for="payment_{{ sPaymentID }}">{{ paymentmethod.oxpayments__oxdesc.value }}</label>
+                                                <div class="payment-option-info{% if oView.getCheckedPaymentId() == paymentmethod.oxpayments__oxid.value %} activePayment{% endif %}">
+                                                    <div class="pcp-payment-content">
+                                                        <div>
+                                                            <img
+                                                                    src="{{ oViewConf.getModuleUrl('PayonePcpPrototype', 'img/Zahlungsmethode_Lastschrift.png') }}"
+                                                                    alt="Direct Debit"
+                                                                    style="max-width: 200px;margin-bottom: 20px;"
+                                                            >
+                                                        </div>
 
-                                                    <div class="form-floating mb-3">
-                                                        <input id="{{ sPaymentID }}_iban" placeholder="{{ translate({ ident: 'PCP_DEMO_IBAN' }) }}" autocomplete="off" type="text" class="form-control" size="20" maxlength="64" name="dynvalue[pcp_demo_iban]" value="DE52940594210000082271" disabled>
-                                                        <label for="{{ sPaymentID }}_iban">{{ translate({ ident: "PCP_DEMO_IBAN" }) }}</label>
-                                                    </div>
-                                                    <div class="form-floating mb-3">
-                                                        <input id="{{ sPaymentID }}_accountholder" placeholder="{{ translate({ ident: 'PCP_DEBIT_ACCOUNTHOLDER' }) }}" autocomplete="off" type="text" class="form-control" size="20" maxlength="64" name="dynvalue[pcp_demo_accountholder]" value="{{ oView.pcpGetCardHolder() }}" disabled>
-                                                        <label for="{{ sPaymentID }}_accountholder">{{ translate({ ident: "PCP_DEBIT_ACCOUNTHOLDER" }) }}</label>
+                                                        <div class="form-floating mb-3">
+                                                            <input id="{{ sPaymentID }}_iban" placeholder="{{ translate({ ident: 'PCP_DEMO_IBAN' }) }}" autocomplete="off" type="text" class="form-control" size="20" maxlength="64" name="dynvalue[pcp_demo_iban]" value="DE52940594210000082271" disabled>
+                                                            <label for="{{ sPaymentID }}_iban">{{ translate({ ident: "PCP_DEMO_IBAN" }) }}</label>
+                                                        </div>
+                                                        <div class="form-floating mb-3">
+                                                            <input id="{{ sPaymentID }}_accountholder" placeholder="{{ translate({ ident: 'PCP_DEBIT_ACCOUNTHOLDER' }) }}" autocomplete="off" type="text" class="form-control" size="20" maxlength="64" name="dynvalue[pcp_demo_accountholder]" value="{{ oView.pcpGetCardHolder() }}" disabled>
+                                                            <label for="{{ sPaymentID }}_accountholder">{{ translate({ ident: "PCP_DEBIT_ACCOUNTHOLDER" }) }}</label>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -151,16 +153,15 @@
                                                 </div>
                                             </div>
                                         </div>
-
                                     {% elseif sPaymentID == "pcpsecureinstallment" %}
                                         <div class="payment-option">
-                                            <div class="pcp-payment-content">
-                                                <div class="payment-option-form">
-                                                    <input class="form-check-input" id="payment_{{ sPaymentID }}" type="radio" name="paymentid"
-                                                           value="{{ sPaymentID }}"{% if oView.getCheckedPaymentId() == paymentmethod.oxpayments__oxid.value %} checked{% endif %}>
-                                                    <label class="form-check-label"
-                                                           for="payment_{{ sPaymentID }}">{{ paymentmethod.oxpayments__oxdesc.value }}</label>
-                                                    <div class="payment-option-info{% if oView.getCheckedPaymentId() == paymentmethod.oxpayments__oxid.value %} activePayment{% endif %}">
+                                            <div class="payment-option-form">
+                                                <input class="form-check-input" id="payment_{{ sPaymentID }}" type="radio" name="paymentid"
+                                                       value="{{ sPaymentID }}"{% if oView.getCheckedPaymentId() == paymentmethod.oxpayments__oxid.value %} checked{% endif %}>
+                                                <label class="form-check-label"
+                                                       for="payment_{{ sPaymentID }}">{{ paymentmethod.oxpayments__oxdesc.value }}</label>
+                                                <div class="payment-option-info{% if oView.getCheckedPaymentId() == paymentmethod.oxpayments__oxid.value %} activePayment{% endif %}">
+                                                    <div class="pcp-payment-content">
                                                         <div>
                                                             <img
                                                                     src="{{ oViewConf.getModuleUrl('PayonePcpPrototype', 'img/zahlungsmethode_ratenkauf.png') }}"

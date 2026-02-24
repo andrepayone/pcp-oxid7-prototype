@@ -11,18 +11,21 @@ use Payone\PcpPrototype\Core\PayoneApiService;
 class InstallmentController extends FrontendController
 {
     protected $_blIsOrderStep = true;
-    protected $_sThisTemplate = 'pcpinstallment';
+    protected $_sThisTemplate = '@PayonePcpPrototype/frontend/page/checkout/pcpinstallment';
     protected ?string $pcpMerchantReference = null;
 
     public function render()
     {
+        Registry::getLogger()->error('Rendering InstallmentController');
         parent::render();
 
-        $sMerchantReference = $this->getPcpMerchantReference();
-        if ($sMerchantReference) {
-            Registry::getSession()->setVariable('pcp_merchant_reference', $sMerchantReference);
+        $merchantReference = $this->getPcpMerchantReference();
+        Registry::getLogger()->error('Merchant reference: ' . $merchantReference);
+        if ($merchantReference) {
+            Registry::getSession()->setVariable('pcp_merchant_reference', $merchantReference);
         }
 
+        Registry::getLogger()->error('Returning template: ' . $this->_sThisTemplate);
         return $this->_sThisTemplate;
     }
 
@@ -50,12 +53,16 @@ class InstallmentController extends FrontendController
 
     public function pcpGetBNPLInstallmentOptions(): array|false
     {
+        Registry::getLogger()->error('Fetching installment options for user: ' . $this->getUser()->oxuser__oxusername->value);
         $oUser = $this->getUser();
         $oApiService = oxNew(PayoneApiService::class);
+        Registry::getLogger()->error('Calling API service to get installment options for user: ' . $oUser->oxuser__oxusername->value);
 
         $orderResponse = $oApiService->getInstallmentOptions($oUser);
+        Registry::getLogger()->error('Received response: ' . json_encode($orderResponse));
 
         $installmentOptions = $this->extractInstallmentOptions($orderResponse);
+        Registry::getLogger()->error('Extracted installment options' . json_encode($installmentOptions));
 
         if ($installmentOptions === null) {
             return false;
@@ -96,6 +103,7 @@ class InstallmentController extends FrontendController
 
     protected function prepareInstallmentOptions(array $installmentOptions): array
     {
+        Registry::getLogger()->error('Prepare installment options:' . json_encode($installmentOptions));
         $prepared = [];
         $count = count($installmentOptions);
 

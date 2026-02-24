@@ -2,7 +2,9 @@
 $sLangName = "English";
 $aLang = [
     'PCP_ADMIN_TITLE'                           => 'PAYONE',
-    'SHOP_MODULE_GROUP_main'                    => 'PAYONE PCP DEMO SETTINGS',
+    'SHOP_MODULE_GROUP_connection'              => 'Connection settings',
+    'SHOP_MODULE_GROUP_demosettings'            => 'Demoshop settings',
+    'SHOP_MODULE_GROUP_colors'                  => 'Color settings',
     'SHOP_MODULE_pcpMerchantId'                 => 'Merchant-ID',
     'SHOP_MODULE_pcpApiEndpoint'                => 'API-Endpoint (URL)',
     'SHOP_MODULE_pcpApiKey'                     => 'API-Key',

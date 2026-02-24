@@ -21,8 +21,6 @@ $aLang = [
     'PCP_YOUR_PAYMENT_REFERENCE_DATA'       => 'Your payment reference data',
     'PCP_DEMO_IBAN'                         => 'IBAN',
     'PCP_DEBIT_ACCOUNTHOLDER'               => 'Accountholder',
-    'PCP_YOUR_CHOICE'                       => '<span style="color:#0096D6;font-weight: bold;">IHRE AUSWAHL</span><br><span style="color:#000;font-weight: bold;">ATTRAKTIVER PRODUKTE</span>',
-    'PCP_START_SUBTEXT'                     => 'Shopping mit gutem Gewissen: Es ist uns ein wichtiges Anliegen, dass all unsere angebotenen Produkte nachhaltige Projekte unterstützen.<br>So werden Lederreste aus Produktionsprozessen zu neuen hochwertigen Produkten aufgewertet statt vernichtet und unsere angebotene Schokolade ist aus fairer Herstellung.',
     'PCP_MERCHANT_REFERENCE_ORDER'          => 'Reference of this order (Merchant Reference)',
     'PCP_CHECKOUT_REFERENCE_ORDER'          => 'Checkout-Reference of this order (Checkout Reference)',
     'PCP_BIRTHDATE'                         => 'Date of Birth',
