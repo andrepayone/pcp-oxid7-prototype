@@ -428,7 +428,7 @@ class ModuleConfigController extends ModuleConfigController_parent
 
             $sCopySource = sprintf('%s/%s', $sSourcePath, $sPic);
             $sCopyTarget = sprintf('%s/%s/%s', $sTargetPath, $sPicNr, $sPic);
-
+            Registry::getLogger()->error(sprintf('Copying demo product picture from %s to %s', $sCopySource, $sCopyTarget));
             if (file_exists($sCopySource)) {
                 if (!file_exists(dirname($sCopyTarget))) {
                     mkdir(dirname($sCopyTarget), 0777, true);

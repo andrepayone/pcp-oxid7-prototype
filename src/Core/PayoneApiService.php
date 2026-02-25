@@ -12,11 +12,15 @@ use PayoneCommercePlatform\Sdk\ApiClient\CheckoutApiClient;
 use PayoneCommercePlatform\Sdk\ApiClient\CommerceCaseApiClient;
 use PayoneCommercePlatform\Sdk\ApiClient\OrderManagementCheckoutActionsApiClient;
 use PayoneCommercePlatform\Sdk\ApiClient\PaymentExecutionApiClient;
+use PayoneCommercePlatform\Sdk\Errors\ApiErrorResponseException;
+use PayoneCommercePlatform\Sdk\Errors\ApiResponseRetrievalException;
 use PayoneCommercePlatform\Sdk\Models\Address;
 use PayoneCommercePlatform\Sdk\Models\AddressPersonal;
 use PayoneCommercePlatform\Sdk\Models\AmountOfMoney;
+use PayoneCommercePlatform\Sdk\Models\AuthorizationMode;
 use PayoneCommercePlatform\Sdk\Models\BankAccountInformation;
 use PayoneCommercePlatform\Sdk\Models\BusinessRelation;
+use PayoneCommercePlatform\Sdk\Models\CardPaymentMethodSpecificInput;
 use PayoneCommercePlatform\Sdk\Models\CartItemInput;
 use PayoneCommercePlatform\Sdk\Models\CartItemInvoiceData;
 use PayoneCommercePlatform\Sdk\Models\CheckoutReferences;
@@ -25,6 +29,7 @@ use PayoneCommercePlatform\Sdk\Models\CompletePaymentRequest;
 use PayoneCommercePlatform\Sdk\Models\ContactDetails;
 use PayoneCommercePlatform\Sdk\Models\CreateCheckoutRequest;
 use PayoneCommercePlatform\Sdk\Models\CreateCommerceCaseRequest;
+use PayoneCommercePlatform\Sdk\Models\CreatePaymentResponse;
 use PayoneCommercePlatform\Sdk\Models\Customer;
 use PayoneCommercePlatform\Sdk\Models\DeliverRequest;
 use PayoneCommercePlatform\Sdk\Models\DeliverType;
@@ -33,15 +38,20 @@ use PayoneCommercePlatform\Sdk\Models\OrderLineDetailsInput;
 use PayoneCommercePlatform\Sdk\Models\OrderRequest;
 use PayoneCommercePlatform\Sdk\Models\OrderType;
 use PayoneCommercePlatform\Sdk\Models\PaymentChannel;
+use PayoneCommercePlatform\Sdk\Models\PaymentExecutionRequest;
 use PayoneCommercePlatform\Sdk\Models\PaymentMethodSpecificInput;
+use PayoneCommercePlatform\Sdk\Models\PaymentExecutionSpecificInput;
 use PayoneCommercePlatform\Sdk\Models\PaymentProduct3391SpecificInput;
 use PayoneCommercePlatform\Sdk\Models\PaymentProduct3392SpecificInput;
 use PayoneCommercePlatform\Sdk\Models\PersonalInformation;
 use PayoneCommercePlatform\Sdk\Models\PersonalName;
 use PayoneCommercePlatform\Sdk\Models\ProductType;
+use PayoneCommercePlatform\Sdk\Models\RedirectionData;
+use PayoneCommercePlatform\Sdk\Models\RedirectPaymentMethodSpecificInput;
 use PayoneCommercePlatform\Sdk\Models\References;
 use PayoneCommercePlatform\Sdk\Models\Shipping;
 use PayoneCommercePlatform\Sdk\Models\ShoppingCartInput;
+use PayoneCommercePlatform\Sdk\Models\TransactionChannel;
 
 class PayoneApiService
 {
@@ -70,8 +80,7 @@ class PayoneApiService
 
     public function sendRequestAuthorization($oOrder, $oUser, array $aDynvalue)
     {
-        $oSession = Registry::getSession();
-        $sPaymentId = $oSession->getVariable('paymentid');
+        $sPaymentId = Registry::getSession()->getVariable('paymentid');
 
         if ($sPaymentId === 'pcpsecureinstallment') {
             return $this->completeInstallmentPayment($oUser);
@@ -101,17 +110,20 @@ class PayoneApiService
 
         $response = $this->commerceCaseClient->createCommerceCase($this->merchantId, $request);
 
-        $oSession->setVariable('pcpCommerceCaseId', $response->getCommerceCaseId());
-        $oSession->setVariable('pcpCheckoutId', $response->getCheckout()->getCheckoutId());
-        $oSession->setVariable('pcpMerchantReference', $sMerchantReference);
+        Registry::getSession()->setVariable('pcpCommerceCaseId', $response->getCommerceCaseId());
+        Registry::getSession()->setVariable('pcpCheckoutId', $response->getCheckout()->getCheckoutId());
+        Registry::getSession()->setVariable('pcpMerchantReference', $sMerchantReference);
 
         return $response;
     }
 
-    public function getInstallmentOptions($oUser)
+    /**
+     * @throws ApiErrorResponseException
+     * @throws ApiResponseRetrievalException
+     */
+    public function getInstallmentOptions($oUser): CreatePaymentResponse
     {
-        $oSession = Registry::getSession();
-        $oBasket = $oSession->getBasket();
+        $oBasket = Registry::getSession()->getBasket();
 
         $commerceCase = $this->commerceCaseClient->createCommerceCase(
             $this->merchantId,
@@ -130,43 +142,47 @@ class PayoneApiService
         $sCommerceCaseId = $commerceCase->getCommerceCaseId();
         $sCheckoutId = $commerceCase->getCheckout()->getCheckoutId();
 
-        $oSession->setVariable('bnplInstallmentCommerceCaseId', $sCommerceCaseId);
-        $oSession->setVariable('bnplInstallmentCheckoutId', $sCheckoutId);
+        Registry::getSession()->setVariable('bnplInstallmentCommerceCaseId', $sCommerceCaseId);
+        Registry::getSession()->setVariable('bnplInstallmentCheckoutId', $sCheckoutId);
 
-        $orderResponse = $this->orderManagementClient->createOrder(
-            $this->merchantId,
-            $sCommerceCaseId,
-            $sCheckoutId,
-            new OrderRequest(
-                orderReferences: new References(merchantReference: $this->generateReference('or')),
-                orderType: OrderType::FULL,
-                paymentMethodSpecificInput: new PaymentMethodSpecificInput(
-                    financingPaymentMethodSpecificInput: new FinancingPaymentMethodSpecificInput(
-                        paymentProductId: 3391,
+        try {
+            $paymentExecutionResponse = $this->paymentExecutionClient->createPayment(
+                $this->merchantId,
+                $sCommerceCaseId,
+                $sCheckoutId,
+                new PaymentExecutionRequest(
+                    paymentMethodSpecificInput: new PaymentMethodSpecificInput(
+                        financingPaymentMethodSpecificInput: new FinancingPaymentMethodSpecificInput(
+                            paymentProductId: 3391,
+                        ),
+                        paymentChannel: PaymentChannel::ECOMMERCE,
                     ),
-                    paymentChannel: PaymentChannel::ECOMMERCE,
+                    paymentExecutionSpecificInput: new PaymentExecutionSpecificInput(
+                        paymentReferences: new References(merchantReference: $this->generateReference('pe')),
+                        amountOfMoney: $this->buildAmountOfMoney(),
+                        shoppingCart: $this->buildShoppingCartFromBasket($oBasket)
+                    ),
                 ),
-            ),
-        );
+            );
+        } catch (\Exception $e) {
+            Registry::getLogger()->error('Error while creating payment execution: ' . $e->getMessage());
+            throw $e;
+        }
 
-        if (
-            $orderResponse->getCreatePaymentResponse() !== null
-            && $orderResponse->getCreatePaymentResponse()->getPaymentExecutionId() !== null
-        ) {
-            $oSession->setVariable(
+        if ($paymentExecutionResponse->getPaymentExecutionId() !== null) {
+            Registry::getSession()->setVariable(
                 'bnplInstallmentPaymentExecutionId',
-                $orderResponse->getCreatePaymentResponse()->getPaymentExecutionId()
+                $paymentExecutionResponse->getPaymentExecutionId()
             );
         }
 
-        return $orderResponse;
+        return $paymentExecutionResponse;
     }
 
     public function deleteTemporaryInstallmentCheckout(): void
     {
-        $oSession = Registry::getSession();
-        $sCommerceCaseId = $oSession->getVariable('bnplInstallmentCommerceCaseId');
-        $sCheckoutId = $oSession->getVariable('bnplInstallmentCheckoutId');
+        $sCommerceCaseId = Registry::getSession()->getVariable('bnplInstallmentCommerceCaseId');
+        $sCheckoutId = Registry::getSession()->getVariable('bnplInstallmentCheckoutId');
 
         if (!$sCommerceCaseId || !$sCheckoutId) {
             return;
@@ -221,19 +237,17 @@ class PayoneApiService
 
     protected function completeInstallmentPayment($oUser)
     {
-        $oSession = Registry::getSession();
-
         return $this->paymentExecutionClient->completePayment(
             $this->merchantId,
-            $oSession->getVariable('bnplInstallmentCommerceCaseId'),
-            $oSession->getVariable('bnplInstallmentCheckoutId'),
-            $oSession->getVariable('bnplInstallmentPaymentExecutionId'),
+            Registry::getSession()->getVariable('bnplInstallmentCommerceCaseId'),
+            Registry::getSession()->getVariable('bnplInstallmentCheckoutId'),
+            Registry::getSession()->getVariable('bnplInstallmentPaymentExecutionId'),
             new CompletePaymentRequest(
                 financingPaymentMethodSpecificInput: new CompleteFinancingPaymentMethodSpecificInput(
                     paymentProductId: 3391,
                     requiresApproval: true,
                     paymentProduct3391SpecificInput: new PaymentProduct3391SpecificInput(
-                        installmentOptionId: $oSession->getVariable('pcp_secinstallment_plan'),
+                        installmentOptionId: Registry::getSession()->getVariable('pcp_secinstallment_plan'),
                         bankAccountInformation: new BankAccountInformation(
                             iban: 'DE52940594210000082271',
                             bic: null,
@@ -316,8 +330,7 @@ class PayoneApiService
 
     protected function buildShippingFromUser($oUser): Shipping
     {
-        $oSession = Registry::getSession();
-        $sDelAddressId = $oSession->getVariable('deladrid');
+        $sDelAddressId = Registry::getSession()->getVariable('deladrid');
 
         if ($sDelAddressId) {
             $oAddress = oxNew(\OxidEsales\Eshop\Application\Model\Address::class);
@@ -451,10 +464,49 @@ class PayoneApiService
             );
         }
 
-        // pcpcreditcard und pcppaypal: siehe offene Fragen unten
+        if ($sPaymentId === 'pcpcreditcard') {
+            return new PaymentMethodSpecificInput(
+                cardPaymentMethodSpecificInput: new CardPaymentMethodSpecificInput(
+                    authorizationMode: AuthorizationMode::PRE_AUTHORIZATION,
+                    paymentProcessingToken: $this->pcpGetShopConfVar('pcpDemoPaymentToken'),
+                    transactionChannel: TransactionChannel::ECOMMERCE,
+                    paymentProductId: 1,
+                    returnUrl: $this->pcpGetReturnUrl(),
+                ),
+                paymentChannel: PaymentChannel::ECOMMERCE,
+            );
+        }
+
+        if ($sPaymentId === 'pcppaypal') {
+            return new PaymentMethodSpecificInput(
+                redirectPaymentMethodSpecificInput: new RedirectPaymentMethodSpecificInput(
+                    requiresApproval: true,
+                    paymentProductId: 840,
+                    redirectionData: new RedirectionData(
+                        returnUrl: $this->pcpGetReturnUrl(),
+                    ),
+                ),
+                paymentChannel: PaymentChannel::ECOMMERCE,
+            );
+        }
+
         return new PaymentMethodSpecificInput(
             paymentChannel: PaymentChannel::ECOMMERCE,
         );
+    }
+
+    protected function pcpGetReturnUrl(): string
+    {
+        $shopUrl = Registry::getConfig()->getCurrentShopUrl();
+
+        $remoteAccessToken = '&rtoken=' . Registry::getSession()->getRemoteAccessToken();
+        $sessionId = Registry::getSession()->sid(true);
+        if ($sessionId != '') {
+            $sessionId = '&' . $sessionId;
+        }
+        $sToken = Registry::getRequest()->getRequestParameter('stoken');
+
+        return $shopUrl . 'index.php?cl=order&fnc=execute&pcpreturn=1&ord_agb=1&stoken=' . $sToken . $sessionId . $remoteAccessToken."&txid=__txid__";
     }
 
     protected function buildAmountOfMoney(): AmountOfMoney

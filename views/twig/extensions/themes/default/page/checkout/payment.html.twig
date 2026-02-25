@@ -23,14 +23,14 @@
                     {% set pcpMerchantReference = oView.pcpGetMerchantReference() %}
                     {% set pcpCheckoutReference = oView.pcpGetCheckoutReference() %}
                     <div class="mb-3 row">
-                        <label class="req col-form-label col-lg-2">{{ translate({ ident: "PCP_MERCHANT_REFERENCE" }) }}:</label>
-                        <div class="col-lg-10">
+                        <label class="req col-form-label col-lg-4">{{ translate({ ident: "PCP_MERCHANT_REFERENCE" }) }}:</label>
+                        <div class="col-lg-8">
                             <input type="text" class="form-control" size="20" maxlength="20" name="dynvalue[pcp_merchant_reference]" value="{{ pcpMerchantReference }}">
                         </div>
                     </div>
                     <div class="mb-3 row">
-                        <label class="req col-form-label col-lg-2">{{ translate({ ident: "PCP_CHECKOUT_REFERENCE" }) }}:</label>
-                        <div class="col-lg-10">
+                        <label class="req col-form-label col-lg-4">{{ translate({ ident: "PCP_CHECKOUT_REFERENCE" }) }}:</label>
+                        <div class="col-lg-8">
                             <input type="text" class="form-control" size="20" maxlength="20" name="dynvalue[pcp_checkout_reference]" value="{{ pcpCheckoutReference }}">
                         </div>
                     </div>
@@ -80,27 +80,27 @@
                                                             <label for="{{ sPaymentID }}_cccardholder">{{ translate({ ident: "PCP_CC_CARDHOLDER" }) }}</label>
                                                         </div>
                                                         <div class="form-floating mb-3">
-                                                            <div class="col-12">{{ translate({ ident: "PCP_VALID_UNTIL" }) }}:</div>
-                                                            <div class="col-6">
-                                                                <select id="{{ sPaymentID }}_ccmonth" name="dynvalue[pcp_demo_ccmonth]" class="form-select" disabled>
-                                                                    {% for m in ['01','02','03','04','05','06','07','08','09','10','11','12'] %}
-                                                                        <option {{ m == '07' ? 'selected' : '' }}>{{ m }}</option>
-                                                                    {% endfor %}
-                                                                </select>
-                                                                <label for="{{ sPaymentID }}_ccmonth">{{ translate({ ident: "PCP_VALID_UNTIL_MONTH" }) }}</label>
-                                                            </div>
-                                                            <div class="col-6">
-                                                                <select id="{{ sPaymentID }}_ccyear" name="dynvalue[pcp_demo_ccyear]" class="form-select" disabled>
-                                                                    {% for y in ['2024','2025','2026','2027','2028'] %}
-                                                                        <option {{ y == '2027' ? 'selected' : '' }}>{{ y }}</option>
-                                                                    {% endfor %}
-                                                                </select>
-                                                                <label for="{{ sPaymentID }}_ccyear">{{ translate({ ident: "PCP_VALID_UNTIL_YEAR" }) }}</label>
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-floating mb-3">
                                                             <input id="{{ sPaymentID }}_cccheck" placeholder="{{ translate({ ident: 'PCP_DEMO_CARD_SECURITY_CODE' }) }}" autocomplete="off" type="text" class="form-control" size="20" maxlength="64" name="dynvalue[pcp_demo_cccheck]" value="123" disabled>
                                                             <label for="{{ sPaymentID }}_cccheck">{{ translate({ ident: "PCP_DEMO_CARD_SECURITY_CODE" }) }}:</label>
+                                                        </div>
+                                                        <div class="form-floating mb-3">
+                                                            {{ translate({ ident: "PCP_VALID_UNTIL" }) }}:
+                                                        </div>
+                                                        <div class="form-floating mb-3">
+                                                            <select id="{{ sPaymentID }}_ccmonth" name="dynvalue[pcp_demo_ccmonth]" class="form-select" disabled>
+                                                                {% for m in ['01','02','03','04','05','06','07','08','09','10','11','12'] %}
+                                                                    <option {{ m == '07' ? 'selected' : '' }}>{{ m }}</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                            <label for="{{ sPaymentID }}_ccmonth">{{ translate({ ident: "PCP_VALID_UNTIL_MONTH" }) }}</label>
+                                                        </div>
+                                                        <div class="form-floating mb-3">
+                                                            <select id="{{ sPaymentID }}_ccyear" name="dynvalue[pcp_demo_ccyear]" class="form-select" disabled>
+                                                                {% for y in ['2024','2025','2026','2027','2028'] %}
+                                                                    <option {{ y == '2027' ? 'selected' : '' }}>{{ y }}</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                            <label for="{{ sPaymentID }}_ccyear">{{ translate({ ident: "PCP_VALID_UNTIL_YEAR" }) }}</label>
                                                         </div>
                                                     </div>
                                                 </div>

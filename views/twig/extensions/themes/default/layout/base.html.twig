@@ -7,15 +7,16 @@
 
 {% block base_js %}
     {{ parent() }}
-    <script>
-        {% if oViewConf.pcpUseCustomColors() %}
-        document.documentElement.style.setProperty('--pcp-primary-color', '{{ oViewConf.pcpGetColor("pcpPrimaryColor") }}');
-        document.documentElement.style.setProperty('--pcp-secondary-color-bright', '{{ oViewConf.pcpGetColor("pcpSecondaryColorBright") }}');
-        document.documentElement.style.setProperty('--pcp-secondary-color-dark', '{{ oViewConf.pcpGetColor("pcpSecondaryColorDark") }}');
-        document.documentElement.style.setProperty('--pcp-tertiary-color-1', '{{ oViewConf.pcpGetColor("pcpTertiaryColor1") }}');
-        document.documentElement.style.setProperty('--pcp-danger-color', '{{ oViewConf.pcpGetColor("pcpDangerColor") }}');
-        document.documentElement.style.setProperty('--pcp-warning-color', '{{ oViewConf.pcpGetColor("pcpWarningColor") }}');
-        document.documentElement.style.setProperty('--pcp-black', '{{ oViewConf.pcpGetColor("pcpBlackColor") }}');
-        {% endif %}
-    </script>
+    {% if oViewConf.pcpUseCustomColors() %}
+        <script>
+            document.documentElement.style.setProperty('--pcp-primary-color', '{{ oViewConf.pcpGetColor("pcpPrimaryColor") }}');
+            document.documentElement.style.setProperty('--pcp-secondary-color-bright', '{{ oViewConf.pcpGetColor("pcpSecondaryColorBright") }}');
+            document.documentElement.style.setProperty('--pcp-secondary-color-dark', '{{ oViewConf.pcpGetColor("pcpSecondaryColorDark") }}');
+            document.documentElement.style.setProperty('--pcp-tertiary-color-1', '{{ oViewConf.pcpGetColor("pcpTertiaryColor1") }}');
+            document.documentElement.style.setProperty('--pcp-danger-color', '{{ oViewConf.pcpGetColor("pcpDangerColor") }}');
+            document.documentElement.style.setProperty('--pcp-warning-color', '{{ oViewConf.pcpGetColor("pcpWarningColor") }}');
+            document.documentElement.style.setProperty('--pcp-black', '{{ oViewConf.pcpGetColor("pcpBlackColor") }}');
+            document.documentElement.style.setProperty('--pcp-background-coloe', '{{ oViewConf.pcpGetColor("pcpBackgroundColor") }}');
+        </script>
+    {% endif %}
 {% endblock %}

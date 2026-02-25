@@ -1,130 +1,174 @@
-{% extends "layout/page.html.twig" %}
-
-{% block content %}
-
-    {% include "page/checkout/inc/steps.html.twig" with {active: 3} %}
-
+{% capture append = "oxidBlock_content" %}
     <script src="{{ oViewConf.getModuleUrl('PayonePcpPrototype', 'js/pcpinstallment.js') }}"></script>
 
-    <form action="{{ oViewConf.getSslSelfLink() }}" class="form-horizontal payment" id="pcpinstallment" name="order" method="post" novalidate="novalidate">
-        <div class="hidden">
-            {{ oViewConf.getHiddenSid()|raw }}
-            {{ oViewConf.getNavFormParams()|raw }}
-            <input type="hidden" name="cl" value="order">
-            <input type="hidden" name="fnc" value="init">
-        </div>
+    <h1 class="visually-hidden">{{ translate({ ident:"PAGE_TITLE_PCPINSTALLMENTCONTROLLER" }) }}</h1>
+    <div class="container-md py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-12 col-lg-10 col-xl-10 col-xxl-6">
+                <div class="row">
+                    <div class="col-lg-7">
+                        <div class="card active mb-3">
+                            <form action="{{ oViewConf.getSslSelfLink() }}" class="form-horizontal payment" id="pcpinstallment" name="order" method="post" novalidate="novalidate">
+                                <div class="hidden">
+                                    {{ oViewConf.getHiddenSid()|raw }}
+                                    {{ oViewConf.getNavFormParams()|raw }}
+                                    <input type="hidden" name="cl" value="order">
+                                    <input type="hidden" name="fnc" value="init">
+                                </div>
 
-        <div class="card mb-3">
-            <div class="card-header">
-                <h3 id="paymentHeader" class="card-title">{{ translate({ ident: "PCP_INSTALLMENT_ACCOUNT_DATA" }) }}</h3>
-            </div>
-            <div class="card-body">
-                <div class="mb-3 row">
-                    <label class="req col-form-label col-lg-2">{{ translate({ ident: "PCP_DEMO_IBAN" }) }}:</label>
-                    <div class="col-lg-10">
-                        <input placeholder="{{ translate({ ident: 'PCP_DEMO_IBAN' }) }}" autocomplete="off" type="text" class="form-control" size="20" maxlength="64" name="dynvalue[pcp_installment_demo_iban]" value="DE52940594210000082271" disabled>
-                    </div>
-                </div>
-
-                <div class="mb-3 row">
-                    <label class="req col-form-label col-lg-2">{{ translate({ ident: "PCP_DEBIT_ACCOUNTHOLDER" }) }}:</label>
-                    <div class="col-lg-10">
-                        <input type="text" class="form-control" size="20" maxlength="64" name="dynvalue[pcp_installment_demo_accountholder]" value="{{ oView.pcpGetCardHolder() }}" disabled>
-                    </div>
-                </div>
-
-                <div class="mb-3 row">
-                    <label class="req col-form-label col-lg-2">{{ translate({ ident: "PCP_BIRTHDATE" }) }}:</label>
-                    <div class="col-lg-10">
-                        <input type="text" class="form-control" size="20" maxlength="64" name="dynvalue[pcp_installment_demo_birthdate]" value="04.11.1985" disabled>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card mb-3">
-            <div class="card-header">
-                <h3 id="paymentHeader" class="card-title">{{ translate({ ident: "PCP_INSTALLMENT_CHOOSE_OPTION" }) }}</h3>
-            </div>
-            <div class="card-body">
-                {% set pcpInstallmentOptions = oView.pcpGetBNPLInstallmentOptions() %}
-                {% if pcpInstallmentOptions %}
-                    {% for index, plan in pcpInstallmentOptions %}
-                        <dl id="bnplPlanOption_{{ index }}">
-                            <dt>
-                                <input id="bnplPlan_{{ index }}" type="radio" name="dynvalue[pcp_secinstallment_plan]" value="{{ plan.installmentOptionId }}" {{ plan.isDefault ? 'checked' : '' }}>
-                                <label for="bnplPlan_{{ index }}">
-                                    <b>{{ plan.monthlyAmount.amount }} {{ plan.monthlyAmount.currency }}</b>
-                                    {{ translate({ ident: "PCP_INSTALLMENT_PER_MONTH" }) }}
-                                    in <b>{{ plan.numberOfPayments }} {{ translate({ ident: "PCP_INSTALLMENT_RATES" }) }}</b>
-                                </label>
-                            </dt>
-                            <dd class="{{ plan.isDefault ? 'activeInstallment' : '' }}">
-                                <div class="container">
-                                    <div class="row">
-                                        <div class="col-sm-3">
-                                            <b>{{ translate({ ident: "PCP_LAST_INSTALLMENT_RATE" }) }}:</b>
-                                        </div>
-                                        <div class="col-sm-8">
-                                            {{ plan.lastRateAmount.amount }} {{ plan.lastRateAmount.currency }}
-                                        </div>
+                                <div class="card mb-3">
+                                    <div class="card-header">
+                                        <h3 id="paymentHeader" class="card-title">{{ translate({ ident: "PCP_INSTALLMENT_ACCOUNT_DATA" }) }}</h3>
                                     </div>
-                                    <div class="row">
-                                        <div class="col-sm-3">
-                                            <b>{{ translate({ ident: "PCP_INSTALLMENT_EFF_INTEREST_RATE" }) }}:</b>
-                                        </div>
-                                        <div class="col-sm-8">
-                                            {{ plan.effectiveInterestRate }} %
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-sm-3">
-                                            <b>{{ translate({ ident: "PCP_INSTALLMENT_NOM_INTEREST_RATE" }) }}:</b>
-                                        </div>
-                                        <div class="col-sm-8">
-                                            {{ plan.nominalInterestRate }} %
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-sm-3">
-                                            <b>{{ translate({ ident: "PCP_INSTALLMENT_TOTAL_AMOUNT" }) }}:</b>
-                                        </div>
-                                        <div class="col-sm-8">
-                                            {{ plan.totalAmount.amount }} {{ plan.totalAmount.currency }}
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-sm-3">
-                                            <b>{{ translate({ ident: "PCP_INSTALLMENT_FIRST_RATE_DATE" }) }}:</b>
-                                        </div>
-                                        <div class="col-sm-8">
-                                            {{ plan.firstRateDate }}
-                                        </div>
-                                    </div>
-                                    {% if plan.creditInformation is defined and plan.creditInformation %}
-                                        <div class="row">
-                                            <div class="col-sm-12">
-                                                <b><a href="{{ plan.creditInformation.href }}">{{ translate({ ident: "PCP_INSTALLMENT_INFO" }) }}</a></b>
+                                    <div class="card-body">
+                                        <div class="row gx-2">
+                                            <div class="col-12 mb-3">
+                                                <div class="form-floating">
+                                                    <input id="pcpinstallment_iban"
+                                                           placeholder="{{ translate({ ident: 'PCP_DEMO_IBAN' }) }}"
+                                                           autocomplete="off"
+                                                           type="text"
+                                                           class="form-control"
+                                                           size="20"
+                                                           maxlength="64"
+                                                           name="dynvalue[pcp_installment_demo_iban]"
+                                                           value="DE52940594210000082271"
+                                                           disabled>
+                                                    <label for="pcpinstallment_iban" class="visually-hidden">{{ translate({ ident: "PCP_DEMO_IBAN" }) }}</label>
+                                                </div>
                                             </div>
                                         </div>
-                                    {% endif %}
+
+                                        <div class="row gx-2">
+                                            <div class="col-12 mb-3">
+                                                <div class="form-floating">
+                                                    <input id="pcpinstallment_accountholder"
+                                                           type="text"
+                                                           class="form-control"
+                                                           size="20"
+                                                           maxlength="64"
+                                                           name="dynvalue[pcp_installment_demo_accountholder]"
+                                                           value="{{ oView.pcpGetCardHolder() }}"
+                                                           disabled>
+                                                    <label for="pcpinstallment_accountholder" class="visually-hidden">{{ translate({ ident: "PCP_DEBIT_ACCOUNTHOLDER" }) }}</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row gx-2">
+                                            <div class="col-12 mb-3">
+                                                <div class="form-floating">
+                                                    <input id="pcpinstallment_birthdate"
+                                                           type="text"
+                                                           class="form-control"
+                                                           size="20"
+                                                           maxlength="64"
+                                                           name="dynvalue[pcp_installment_demo_birthdate]"
+                                                           value="04.11.1985"
+                                                           disabled>
+                                                    <label for="pcpinstallment_birthdate" class="visually-hidden">{{ translate({ ident: "PCP_BIRTHDATE" }) }}</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </dd>
-                        </dl>
-                    {% endfor %}
-                {% endif %}
+
+                                <div class="card mb-3">
+                                    <div class="card-header">
+                                        <h3 id="paymentHeader" class="card-title">{{ translate({ ident: "PCP_INSTALLMENT_CHOOSE_OPTION" }) }}</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        {% set pcpInstallmentOptions = oView.pcpGetBNPLInstallmentOptions() %}
+                                        {% if pcpInstallmentOptions %}
+                                            {% for index, plan in pcpInstallmentOptions %}
+                                                <dl id="bnplPlanOption_{{ index }}">
+                                                    <dt>
+                                                        <input id="bnplPlan_{{ index }}" type="radio" name="dynvalue[pcp_secinstallment_plan]" value="{{ plan.installmentOptionId }}" {{ plan.isDefault ? 'checked' : '' }}>
+                                                        <label for="bnplPlan_{{ index }}">
+                                                            <b>{{ plan.monthlyAmount.amount }} {{ plan.monthlyAmount.currency }}</b>
+                                                            {{ translate({ ident: "PCP_INSTALLMENT_PER_MONTH" }) }}
+                                                            in <b>{{ plan.numberOfPayments }} {{ translate({ ident: "PCP_INSTALLMENT_RATES" }) }}</b>
+                                                        </label>
+                                                    </dt>
+                                                    <dd class="{{ plan.isDefault ? 'activeInstallment' : '' }}">
+                                                        <div class="container">
+                                                            <div class="row">
+                                                                <div class="col-sm-4">
+                                                                    <b>{{ translate({ ident: "PCP_LAST_INSTALLMENT_RATE" }) }}:</b>
+                                                                </div>
+                                                                <div class="col-sm-7">
+                                                                    {{ plan.lastRateAmount.amount }} {{ plan.lastRateAmount.currency }}
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-sm-4">
+                                                                    <b>{{ translate({ ident: "PCP_INSTALLMENT_EFF_INTEREST_RATE" }) }}:</b>
+                                                                </div>
+                                                                <div class="col-sm-7">
+                                                                    {{ plan.effectiveInterestRate }} %
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-sm-4">
+                                                                    <b>{{ translate({ ident: "PCP_INSTALLMENT_NOM_INTEREST_RATE" }) }}:</b>
+                                                                </div>
+                                                                <div class="col-sm-7">
+                                                                    {{ plan.nominalInterestRate }} %
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-sm-4">
+                                                                    <b>{{ translate({ ident: "PCP_INSTALLMENT_TOTAL_AMOUNT" }) }}:</b>
+                                                                </div>
+                                                                <div class="col-sm-7">
+                                                                    {{ plan.totalAmount.amount }} {{ plan.totalAmount.currency }}
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-sm-4">
+                                                                    <b>{{ translate({ ident: "PCP_INSTALLMENT_FIRST_RATE_DATE" }) }}:</b>
+                                                                </div>
+                                                                <div class="col-sm-7">
+                                                                    {{ plan.firstRateDate }}
+                                                                </div>
+                                                            </div>
+                                                            {% if plan.creditInformation is defined and plan.creditInformation %}
+                                                                <div class="row">
+                                                                    <div class="col-sm-12">
+                                                                        <b><a href="{{ plan.creditInformation.href }}">{{ translate({ ident: "PCP_INSTALLMENT_INFO" }) }}</a></b>
+                                                                    </div>
+                                                                </div>
+                                                            {% endif %}
+                                                        </div>
+                                                    </dd>
+                                                </dl>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <a href="{{ seo_url({ ident: oViewConf.getSelfLink() ~ "cl=payment" }) }}"
+                           class="btn btn-outline-primary btn-back mb-3">
+                            <svg>
+                                <use xlink:href="#left"></use>
+                            </svg>
+                            {{ translate({ ident: "PREVIOUS_STEP" }) }}
+                        </a>
+                    </div>
+                    <div class="col-lg-5">
+                        <div class="sticky-md-top">
+                            {% include "page/checkout/inc/summary_sidebar.html.twig" %}
+
+                            <button type="button" class="btn btn-highlight btn-lg w-100"
+                                    onclick="document.querySelector('#pcpinstallment').requestSubmit();">
+                                {{ translate({ ident: "NEXT" }) }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-
-        <div class="card-body cart-buttons">
-            <a href="{{ seo_url({ ident: oViewConf.getOrderLink() }) }}" class="btn btn-outline-dark float-start prevStep submitButton largeButton" id="paymentBackStepBottom">
-                <i class="fas fa-caret-left"></i> {{ translate({ ident: "PREVIOUS_STEP" }) }}
-            </a>
-            <button type="submit" name="userform" class="btn btn-primary float-end submitButton nextStep largeButton" id="paymentNextStepBottom">
-                {{ translate({ ident: "CONTINUE_TO_NEXT_STEP" }) }} <i class="fas fa-caret-right"></i>
-            </button>
-            <div class="clearfix"></div>
-        </div>
-    </form>
-
-{% endblock %}
+    </div>
+{% endcapture %}
+{% include "layout/page.html.twig" with {active_step: 2} %}

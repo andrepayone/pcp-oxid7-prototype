@@ -5,10 +5,14 @@ declare(strict_types=1);
 namespace Payone\PcpPrototype\Core;
 
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleConfigurationDaoBridgeInterface;
+use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
+
 
 class ViewConfig extends ViewConfig_parent
 {
     protected static array $validColorGroups = [
+        'pcpBackgroundColor',
         'pcpPrimaryColor',
         'pcpSecondaryColorBright',
         'pcpSecondaryColorDark',
@@ -20,27 +24,27 @@ class ViewConfig extends ViewConfig_parent
 
     public function pcpGetStringConfigParam(string $sConfigParam): string
     {
-        return (string) Registry::getConfig()->getConfigParam($sConfigParam);
+        return (string) $this->pcpGetShopConfVar($sConfigParam);
     }
 
     public function pcpUseFixedNoregestration(): bool
     {
-        return (bool) Registry::getConfig()->getConfigParam('pcpUseFixedNoregestration');
+        return (bool) $this->pcpGetShopConfVar('pcpUseFixedNoregestration');
     }
 
     public function pcpUseFixedShipping(): bool
     {
-        return (bool) Registry::getConfig()->getConfigParam('pcpUseFixedShipping');
+        return (bool) $this->pcpGetShopConfVar('pcpUseFixedShipping');
     }
 
     public function pcpUseCustomColors(): bool
     {
-        return (bool) Registry::getConfig()->getConfigParam('pcpUseCustomColors');
+        return (bool) $this->pcpGetShopConfVar('pcpUseCustomColors');
     }
 
     public function pcpUseCustomShopLogo(): bool
     {
-        return (bool) Registry::getConfig()->getConfigParam('pcpUseCustomShopLogo');
+        return (bool) $this->pcpGetShopConfVar('pcpUseCustomShopLogo');
     }
 
     public function pcpGetColor(string $sColorGroup): string
@@ -49,7 +53,7 @@ class ViewConfig extends ViewConfig_parent
             return '#000';
         }
 
-        return (string) Registry::getConfig()->getConfigParam($sColorGroup);
+        return (string) $this->pcpGetShopConfVar($sColorGroup);
     }
 
     public function pcpGetShopLogo(): string
@@ -68,4 +72,22 @@ class ViewConfig extends ViewConfig_parent
 
         return $this->getModuleUrl('PayonePcpPrototype', 'img/payone_logo.png');
     }
+
+    /**
+     * Returns config value
+     *
+     * @param  string $sVarName
+     * @return mixed|false
+     */
+    public function pcpGetShopConfVar($sVarName)
+    {
+        $container = ContainerFactory::getInstance()->getContainer();
+        $moduleConfiguration =
+            $container->get(ModuleConfigurationDaoBridgeInterface::class)->get("PayonePcpPrototype");
+        if (!$moduleConfiguration->hasModuleSetting($sVarName)) {
+            return false;
+        }
+        return $moduleConfiguration->getModuleSetting($sVarName)->getValue();
+    }
+
 }
