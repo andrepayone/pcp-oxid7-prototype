@@ -3,7 +3,7 @@
 {% block admin_module_config_form %}
     {% if pcpResultMessage %}
         <div>
-            <b>{{ pcpResultMessage }}</b>
+            <b>{{ pcpResultMessage|raw }}</b>
         </div>
         <hr id="pcp_setup_result_message">
     {% endif %}
