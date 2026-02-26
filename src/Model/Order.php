@@ -37,16 +37,16 @@ class Order extends Order_parent
         return Payment::isPcpPaymentType($sPaymentType);
     }
 
-    public function pcpHandleAuthorization(bool $blReturnRedirectUrl = false, $oPayGateway = null): bool
+    public function pcpHandleAuthorization(bool $blReturnRedirectUrl = false, $paymentGateway = null): bool
     {
-        $oSession = Registry::getSession();
-        $aDynValue = $oSession->getVariable('dynvalue') ?: [];
-        $oUser = $this->getOrderUser();
+        $dynValue = Registry::getSession()->getVariable('dynvalue') ?: [];
+        $user = $this->getOrderUser();
+        Registry::getLogger()->error('Handle authorization with dynvalue: ' . print_r($dynValue, true));
 
-        $oApiService = oxNew(PayoneApiService::class);
-        $response = $oApiService->sendRequestAuthorization($this, $oUser, $aDynValue);
+        $apiService = oxNew(PayoneApiService::class);
+        $response = $apiService->sendRequestAuthorization($this, $user, $dynValue);
 
-        return $this->pcpHandleAuthorizationResponse($response, $oPayGateway);
+        return $this->pcpHandleAuthorizationResponse($response, $paymentGateway);
     }
 
     public function pcpIsReturnFromRedirect(): bool

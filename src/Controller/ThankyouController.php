@@ -2,12 +2,11 @@
 
 namespace Payone\PcpPrototype\Controller;
 
-use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Core\Registry;
 
 const PCP_MODULE_PATH = "modules/Payone/PcpPrototype/";
 
-class ThankyouController extends FrontendController
+class ThankyouController extends ThankyouController_parent
 {
     protected $pcpOrderResponse = null;
 
@@ -26,17 +25,23 @@ class ThankyouController extends FrontendController
      */
     public function render()
     {
+        Registry::getLogger()->error('Render thankyou controller');
+
         $orderResponse = Registry::getSession()->getVariable('pcpOrderResponse');
         if ($orderResponse) {
+            Registry::getLogger()->error('Order response: '. $orderResponse);
             $this->pcpOrderResponse = $orderResponse;
             Registry::getSession()->deleteVariable('pcpOrderResponse');
             Registry::getSession()->deleteVariable('usr');
         }
         $merchantReferenceSession = Registry::getSession()->getVariable('pcp_merchant_reference');
         if ($merchantReferenceSession) {
+            Registry::getLogger()->error('Merchant reference from session: '. $merchantReferenceSession);
             $this->merchantReference = $merchantReferenceSession;
             Registry::getSession()->deleteVariable('pcp_merchant_reference');
         }
+
+        Registry::getLogger()->error('Call parent render in thankyou controller');
         return parent::render();
     }
 

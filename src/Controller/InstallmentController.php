@@ -55,6 +55,7 @@ class InstallmentController extends FrontendController
         $oApiService = oxNew(PayoneApiService::class);
 
         $paymentExecutionResponse = $oApiService->getInstallmentOptions($oUser);
+        Registry::getLogger()->error('Payment Execution Response: ' . print_r($paymentExecutionResponse, true));
 
         $installmentOptions = $this->extractInstallmentOptions($paymentExecutionResponse);
 
