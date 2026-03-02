@@ -3,6 +3,7 @@
 namespace Payone\PcpPrototype\Controller;
 
 use OxidEsales\Eshop\Core\Registry;
+use kreativekorp\barcode\barcode_generator;
 
 const PCP_MODULE_PATH = "modules/Payone/PcpPrototype/";
 
@@ -172,99 +173,90 @@ class ThankyouController extends ThankyouController_parent
     public function pcpGetBarcodeCommerceCase()
     {
         $sIdent = $this->pcpGetCommerceCaseId();
-        return $this->pcpGetBarcode($sIdent);
+        return $this->pcpGetScanCode($sIdent);
     }
 
     public function pcpGetBarcodeTxid()
     {
         $sIdent = $this->pcpGetTxid();
-        return $this->pcpGetBarcode($sIdent);
+        return $this->pcpGetScanCode($sIdent);
     }
 
     public function pcpGetBarcodeCheckout()
     {
         $sIdent = $this->pcpGetCheckoutId();
-        return $this->pcpGetBarcode($sIdent);
+        return $this->pcpGetScanCode($sIdent);
     }
 
     public function pcpGetBarcodeReference()
     {
         $sIdent = $this->pcpGetMerchantReference();
-        return $this->pcpGetBarcode($sIdent);
+        return $this->pcpGetScanCode($sIdent);
     }
 
     public function pcpGetQrCodeReference()
     {
         $sIdent = $this->pcpGetMerchantReference();
-        return $this->pcpGetQrCode($sIdent);
+        return $this->pcpGetScanCode($sIdent, 'qr');
     }
 
     public function pcpGetBarcodeCheckoutReference()
     {
         $sIdent = $this->pcpGetCheckoutReference();
-        return $this->pcpGetBarcode($sIdent);
+        return $this->pcpGetScanCode($sIdent);
     }
 
     public function pcpGetQrCodeCheckoutReference()
     {
         $sIdent = $this->pcpGetCheckoutReference();
-        return $this->pcpGetQrCode($sIdent);
+        return $this->pcpGetScanCode($sIdent, 'qr');
     }
 
 
     public function pcpGetQrCodeCommerceCase()
     {
         $sIdent = $this->pcpGetCommerceCaseId();
-        return $this->pcpGetQrCode($sIdent);
+        return $this->pcpGetScanCode($sIdent, 'qr');
     }
 
     public function pcpGetQrCodeTxid()
     {
         $sIdent = $this->pcpGetTxid();
-        return $this->pcpGetQrCode($sIdent);
+        return $this->pcpGetScanCode($sIdent, 'qr');
     }
 
     public function pcpGetQrCodeCheckout()
     {
         $sIdent = $this->pcpGetCheckoutId();
-        return $this->pcpGetQrCode($sIdent);
+        return $this->pcpGetScanCode($sIdent, 'qr');
     }
 
-    public function pcpGetQrCode($ident)
-    {
-        $qrLibPath = getShopBasePath() . PCP_MODULE_PATH . "lib/phpqrcode/qrlib.php";
-        $qrCodeFolder = getShopBasePath() . "out/pictures/qrcodes";
-        if (!file_exists($qrCodeFolder)) {
-            mkdir($qrCodeFolder, 0777, true);
-        }
-        $file = $qrCodeFolder . sprintf("/%s.png", $ident);
-        $imageSource = sprintf("out/pictures/qrcodes/%s.png", $ident);
-
-        // create qrcode
-        include_once $qrLibPath;
-        QRcode::png($ident, $file);
-
-        return $imageSource;
-    }
-
-    public function pcpGetBarcode($ident)
+    public function pcpGetScanCode($ident, $type = 'code-128')
     {
         $barcodeLibPath = getShopBasePath() . PCP_MODULE_PATH . "lib/barcode.php";
-        $barcodeFolder = getShopBasePath() . "out/pictures/barcodes";
-        if (!file_exists($barcodeFolder)) {
-            mkdir($barcodeFolder, 0777, true);
+        $scanCodeFolder = getShopBasePath() . "out/pictures/scancodes";
+        if (!file_exists($scanCodeFolder)) {
+            mkdir($scanCodeFolder, 0777, true);
         }
-        $file = $barcodeFolder . sprintf("/%s.png", $ident);
-        $imageSource = sprintf("out/pictures/barcodes/%s.png", $ident);
+        $file = $scanCodeFolder . sprintf("/%s_%s.png", $ident, $type);
+        $imageSource = sprintf("out/pictures/scancodes/%s_%s.png", $ident, $type);
+
+        $paths = [
+            'libPath' => $barcodeLibPath,
+            'qrCodeFolder' => $scanCodeFolder,
+            'file' => $file,
+            'imageSource' => $imageSource
+        ];
+        Registry::getLogger()->error('Paths for scancodes:' . print_r($paths, true));
 
         // create barcode
         include_once $barcodeLibPath;
         $generator = new barcode_generator();
         $options = [
             'f' => 'png',
-            's' => 'code-128',
+            's' => $type,
         ];
-        $image = $generator->render_image('code-128', $ident, $options);
+        $image = $generator->render_image($type, sprintf('%s_%s', $ident, $type), $options);
         imagepng($image, $file);
 
         return $imageSource;
