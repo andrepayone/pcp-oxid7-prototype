@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Payone\PcpPrototype\Core;
 
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Field;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleConfigurationDaoBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
+use Payone\PcpPrototype\Model\ApiLog;
 use PayoneCommercePlatform\Sdk\CommunicatorConfiguration;
 use PayoneCommercePlatform\Sdk\ApiClient\CheckoutApiClient;
 use PayoneCommercePlatform\Sdk\ApiClient\CommerceCaseApiClient;
@@ -81,7 +83,7 @@ class PayoneApiService
         $this->paymentExecutionClient = new PaymentExecutionApiClient($this->config);
     }
 
-    public function sendRequestAuthorization($order, $user, array $dynValue): CreateCommerceCaseResponse | CompletePaymentResponse
+    public function sendRequestAuthorization($order, $user, array $dynValue): CreateCommerceCaseResponse | CompletePaymentResponse | null
     {
         $sPaymentId = Registry::getSession()->getVariable('paymentid');
         Registry::getLogger()->error('Starting authorization request with payment id ' . $sPaymentId . ' for user ' . $user->oxuser__oxusername->value);
@@ -91,11 +93,11 @@ class PayoneApiService
             return $this->completeInstallmentPayment($order, $user, $dynValue);
         }
 
-        $sMerchantReference = $this->generateReference('dm');
+        $merchantReference = $this->generateReference('dm');
         $blAutoExecute = ($sPaymentId !== 'pcppayinstore');
 
         $request = new CreateCommerceCaseRequest(
-            merchantReference: $sMerchantReference,
+            merchantReference: $merchantReference,
             customer: $this->buildCustomerFromOrder($order, $user),
             checkout: new CreateCheckoutRequest(
                 references: new CheckoutReferences(merchantReference: $this->generateReference('ck')),
@@ -115,12 +117,38 @@ class PayoneApiService
 
         $response = $this->commerceCaseClient->createCommerceCase($this->merchantId, $request);
 
+        // log complete entry
+        $requestJson = json_encode(print_r($request, true));
+        $responseJson = json_encode(print_r($response, true));
+        $responseCode = '000';
+        $requestType = 'UNKNOWN';
+        $reuestUrl = 'https://unknown.url';
+        $this->pcpApiLog($requestType, $reuestUrl, $requestJson, $responseJson, $responseCode, $merchantReference);
+
+
         Registry::getSession()->setVariable('pcpCommerceCaseId', $response->getCommerceCaseId());
         Registry::getSession()->setVariable('pcpCheckoutId', $response->getCheckout()->getCheckoutId());
-        Registry::getSession()->setVariable('pcpMerchantReference', $sMerchantReference);
+        Registry::getSession()->setVariable('pcpMerchantReference', $merchantReference);
 
         return $response;
     }
+
+    public function pcpApiLog($requestType, $requestUrl, $requestJson, $responseJson, $responseCode, $merchantReference): void
+    {
+        $apiLog = oxNew(ApiLog::class);
+        $sNewId = md5(sprintf('%d', rand()));
+
+        $apiLog->pcpapilog__oxid = new Field($sNewId);
+        $apiLog->pcpapilog__pcp_timestamp = new Field(date('Y-m-d H:i:s', time()));
+        $apiLog->pcpapilog__pcp_requesttype = new Field($requestType);
+        $apiLog->pcpapilog__pcp_requesturl = new Field($requestUrl);
+        $apiLog->pcpapilog__pcp_refnr = new Field($merchantReference);
+        $apiLog->pcpapilog__pcp_request = new Field($requestJson);
+        $apiLog->pcpapilog__pcp_response = new Field($responseJson);
+        $apiLog->pcpapilog__pcp_response_httpcode = new Field($responseCode);
+        $apiLog->save();
+    }
+
 
     /**
      * @throws ApiErrorResponseException
@@ -243,7 +271,7 @@ class PayoneApiService
         );
     }
 
-    protected function completeInstallmentPayment($order, $user, $dynValue): CompletePaymentResponse
+    protected function completeInstallmentPayment($order, $user, $dynValue): CompletePaymentResponse | null
     {
         $commerceCaseId = Registry::getSession()->getVariable('bnplInstallmentCommerceCaseId');
         $checkoutId = Registry::getSession()->getVariable('bnplInstallmentCheckoutId');
@@ -259,41 +287,63 @@ class PayoneApiService
         ], true));
 
         try {
-            return $this->paymentExecutionClient->completePayment(
+            $completePaymentRequest = new CompletePaymentRequest(
+                financingPaymentMethodSpecificInput: new CompleteFinancingPaymentMethodSpecificInput(
+                    paymentProductId: 3391,
+                    requiresApproval: true,
+                    paymentProduct3391SpecificInput: new PaymentProduct3391SpecificInput(
+                        installmentOptionId: $installmentOptionId,
+                        bankAccountInformation: new BankAccountInformation(
+                            iban: 'DE52940594210000082271',
+                            bic: null,
+                            accountHolder: $user->oxuser__oxfname->value . ' ' . $user->oxuser__oxlname->value,
+                        ),
+                    ),
+                ),
+                order: new Order(
+                    references: new References(
+                        merchantReference: $merchantReference
+                    ),
+                    amountOfMoney: $this->buildAmountOfMoney(),
+                    customer: $this->buildCustomerFromOrder($order, $user),
+                    shipping: $this->buildShippingFromOrder($order),
+                    shoppingCart: $this->buildShoppingCartFromOrder($order),
+                )
+            );
+            $response = $this->paymentExecutionClient->completePayment(
                 merchantId: $this->merchantId,
                 commerceCaseId: $commerceCaseId,
                 checkoutId: $checkoutId,
                 paymentExecutionId: $paymentExecutionId,
-                completePaymentRequest: new CompletePaymentRequest(
-                    financingPaymentMethodSpecificInput: new CompleteFinancingPaymentMethodSpecificInput(
-                        paymentProductId: 3391,
-                        requiresApproval: true,
-                        paymentProduct3391SpecificInput: new PaymentProduct3391SpecificInput(
-                            installmentOptionId: $installmentOptionId,
-                            bankAccountInformation: new BankAccountInformation(
-                                iban: 'DE52940594210000082271',
-                                bic: null,
-                                accountHolder: $user->oxuser__oxfname->value . ' ' . $user->oxuser__oxlname->value,
-                            ),
-                        ),
-                    ),
-                    order: new Order(
-                        references: new References(
-                            merchantReference: $merchantReference
-                        ),
-                        amountOfMoney: $this->buildAmountOfMoney(),
-                        customer: $this->buildCustomerFromOrder($order, $user),
-                        shipping: $this->buildShippingFromOrder($order),
-                        shoppingCart: $this->buildShoppingCartFromOrder($order),
-                    )
-                ),
+                completePaymentRequest: $completePaymentRequest
             );
+
+            $request = [
+                'merchantId' => $this->merchantId,
+                'commerceCaseId' => $commerceCaseId,
+                'checkoutId' => $checkoutId,
+                'paymentExecutionId' => $paymentExecutionId,
+                'completePaymentRequest' => $completePaymentRequest,
+            ];
+
+            // log complete entry
+            $requestJson = json_encode(print_r($request, true));
+            $responseJson = json_encode(print_r($response, true));
+            $responseCode = '000';
+            $requestType = 'UNKNOWN';
+            $reuestUrl = 'https://unknown.url';
+            $this->pcpApiLog($requestType, $reuestUrl, $requestJson, $responseJson, $responseCode, $merchantReference);
+
+            return $response;
         } catch (ApiErrorResponseException $e) {
             Registry::getLogger()->error('ApiErrorResponseException while completePayment: ' . $e->getMessage());
             Registry::getLogger()->error('Errors: ' . print_r($e->getErrors(), true));
             Registry::getLogger()->error('Response Body: ' . $e->getResponseBody());
             Registry::getLogger()->error('Trace: ' . $e->getTraceAsString());
+            throw $e;
         }
+
+        return null;
     }
 
     protected function buildCustomerFromOrder($oOrder, $oUser): Customer

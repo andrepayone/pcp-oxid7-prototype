@@ -109,6 +109,11 @@ class Order extends Order_parent
 
     protected function pcpHandleAuthorizationResponse(CreateCommerceCaseResponse | CompletePaymentResponse $response, $payGateway, $dynValue): bool
     {
+        if ($response === null) {
+            Registry::getLogger()->error('Authorization response is null');
+            return false;
+        }
+
         $aSessionData = $this->extractResponseDataForSession($response, $dynValue);
 
         Registry::getSession()->setVariable('pcpOrderResponse', $aSessionData);
