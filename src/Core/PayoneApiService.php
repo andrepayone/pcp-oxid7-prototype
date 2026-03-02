@@ -26,9 +26,11 @@ use PayoneCommercePlatform\Sdk\Models\CartItemInvoiceData;
 use PayoneCommercePlatform\Sdk\Models\CheckoutReferences;
 use PayoneCommercePlatform\Sdk\Models\CompleteFinancingPaymentMethodSpecificInput;
 use PayoneCommercePlatform\Sdk\Models\CompletePaymentRequest;
+use PayoneCommercePlatform\Sdk\Models\CompletePaymentResponse;
 use PayoneCommercePlatform\Sdk\Models\ContactDetails;
 use PayoneCommercePlatform\Sdk\Models\CreateCheckoutRequest;
 use PayoneCommercePlatform\Sdk\Models\CreateCommerceCaseRequest;
+use PayoneCommercePlatform\Sdk\Models\CreateCommerceCaseResponse;
 use PayoneCommercePlatform\Sdk\Models\CreatePaymentResponse;
 use PayoneCommercePlatform\Sdk\Models\Customer;
 use PayoneCommercePlatform\Sdk\Models\DeliverRequest;
@@ -79,7 +81,7 @@ class PayoneApiService
         $this->paymentExecutionClient = new PaymentExecutionApiClient($this->config);
     }
 
-    public function sendRequestAuthorization($order, $user, array $dynValue)
+    public function sendRequestAuthorization($order, $user, array $dynValue): CreateCommerceCaseResponse | CompletePaymentResponse
     {
         $sPaymentId = Registry::getSession()->getVariable('paymentid');
         Registry::getLogger()->error('Starting authorization request with payment id ' . $sPaymentId . ' for user ' . $user->oxuser__oxusername->value);
@@ -241,7 +243,7 @@ class PayoneApiService
         );
     }
 
-    protected function completeInstallmentPayment($order, $user, $dynValue)
+    protected function completeInstallmentPayment($order, $user, $dynValue): CompletePaymentResponse
     {
         $commerceCaseId = Registry::getSession()->getVariable('bnplInstallmentCommerceCaseId');
         $checkoutId = Registry::getSession()->getVariable('bnplInstallmentCheckoutId');

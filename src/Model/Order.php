@@ -10,6 +10,8 @@ use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use Payone\PcpPrototype\Core\PayoneApiService;
 use PayoneCommercePlatform\Sdk\Models\ActionType;
+use PayoneCommercePlatform\Sdk\Models\CompletePaymentResponse;
+use PayoneCommercePlatform\Sdk\Models\CreateCommerceCaseResponse;
 
 class Order extends Order_parent
 {
@@ -46,7 +48,7 @@ class Order extends Order_parent
         $apiService = oxNew(PayoneApiService::class);
         $response = $apiService->sendRequestAuthorization($this, $user, $dynValue);
 
-        return $this->pcpHandleAuthorizationResponse($response, $paymentGateway);
+        return $this->pcpHandleAuthorizationResponse($response, $paymentGateway, $dynValue);
     }
 
     public function pcpIsReturnFromRedirect(): bool
@@ -105,14 +107,18 @@ class Order extends Order_parent
         $this->oxorder__oxdelsal = new Field('');
     }
 
-    protected function pcpHandleAuthorizationResponse($response, $oPayGateway): bool
+    protected function pcpHandleAuthorizationResponse(CreateCommerceCaseResponse | CompletePaymentResponse $response, $payGateway, $dynValue): bool
     {
-        $oSession = Registry::getSession();
-        $aSessionData = $this->extractResponseDataForSession($response);
+        $aSessionData = $this->extractResponseDataForSession($response, $dynValue);
 
-        $oSession->setVariable('pcpOrderResponse', $aSessionData);
-        $oSession->setVariable('pcpOrderId', $this->getId());
+        Registry::getSession()->setVariable('pcpOrderResponse', $aSessionData);
+        Registry::getSession()->setVariable('pcpOrderId', $this->getId());
         $this->pcpSaveResponseReferences($aSessionData);
+
+        if ($response instanceof CompletePaymentResponse) {
+            // Completed installment payment. No need for further processing
+            return true;
+        }
 
         $checkout = $response->getCheckout();
 
@@ -182,9 +188,20 @@ class Order extends Order_parent
         return $payment->getStatus() === 'PENDING_CAPTURE';
     }
 
-    protected function extractResponseDataForSession($response): array
+    protected function extractResponseDataForSession(CreateCommerceCaseResponse | CompletePaymentResponse $response, $dynValue): array
     {
         $data = [];
+
+        if ($response instanceof CompletePaymentResponse) {
+            Registry::getLogger()->info('Response of request is of type complete request');
+            $data['commerceCaseId'] = Registry::getSession()->getVariable('bnplInstallmentCommerceCaseId');
+            $checkoutId = Registry::getSession()->getVariable('bnplInstallmentCheckoutId');
+            $data['merchantReference'] = $dynValue['pcp_merchant_reference'];
+            $data['checkout'] = [
+                'checkoutId' => $checkoutId,
+            ];
+            return $data;
+        }
 
         $data['commerceCaseId'] = $response->getCommerceCaseId();
         $data['merchantReference'] = $response->getMerchantReference();
