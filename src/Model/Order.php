@@ -262,10 +262,10 @@ class Order extends Order_parent
     protected function pcpHandleAuthorizationRedirect(string $sRedirectUrl): void
     {
         if (!$this->oxorder__oxordernr->value) {
-            $this->_setNumber();
+            $this->setNumber();
         } else {
             oxNew(Counter::class)->update(
-                $this->_getCounterIdent(),
+                $this->getCounterIdent(),
                 $this->oxorder__oxordernr->value
             );
         }
