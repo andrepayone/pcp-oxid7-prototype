@@ -1,6 +1,12 @@
 {% extends 'page/shop/start.html.twig' %}
 
 {% block start_bargain_articles %}
+    <div class="d-flex flex-column row-spacer justify-content-between align-items-center pcp-banner-start">
+        {% include "widget/promoslider.html.twig" %}
+    </div>
+    <div>
+        {% include_content 'pcpstartgreeter' ignore missing  %}
+    </div>
     {% set oBargainArticles = oView.getBargainArticleList() %}
     {% if oBargainArticles and oBargainArticles|length > 0 %}
         <div class="d-flex flex-column row-spacer justify-content-between align-items-center">

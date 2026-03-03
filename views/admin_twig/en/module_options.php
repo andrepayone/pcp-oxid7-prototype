@@ -19,6 +19,7 @@ $aLang = [
     'SHOP_MODULE_pcpFixedShippingZip'           => 'ZIP of fixed shipping address',
     'SHOP_MODULE_pcpFixedShippingCity'          => 'City of fixed shipping address',
     'SHOP_MODULE_pcpUseCustomColors'            => 'Use custom colors for shops',
+    'SHOP_MODULE_pcpBackgroundColor'            => 'Background Color of the website',
     'SHOP_MODULE_pcpPrimaryColor'               => 'Primary Color',
     'SHOP_MODULE_pcpSecondaryColorBright'       => 'Secondary Color (Bright)',
     'SHOP_MODULE_pcpSecondaryColorDark'         => 'Secondary Color (Dark)',

@@ -19,6 +19,7 @@ $aLang = [
     'SHOP_MODULE_pcpFixedShippingZip'           => 'Postleitzahl der voreingestellten Lieferaddresse',
     'SHOP_MODULE_pcpFixedShippingCity'          => 'Ort der voreingestellten Lieferaddresse',
     'SHOP_MODULE_pcpUseCustomColors'            => 'Eigene Farben für den Shop wählen',
+    'SHOP_MODULE_pcpBackgroundColor'            => 'Hintergrundfarbe der Webseite',
     'SHOP_MODULE_pcpPrimaryColor'               => 'Primärfarbe',
     'SHOP_MODULE_pcpSecondaryColorBright'       => 'Sekundärfarbe (Hell)',
     'SHOP_MODULE_pcpSecondaryColorDark'         => 'Sekundärfarbe (Dunkel)',

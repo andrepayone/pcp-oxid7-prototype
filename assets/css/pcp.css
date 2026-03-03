@@ -98,6 +98,10 @@ body {
     border-radius: 50%;
 }
 
+.pcp-banner-start {
+    margin-top: 10px;
+}
+
 .steps .step {
     position: relative;
     padding: 40px 20px 0;
