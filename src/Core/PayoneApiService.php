@@ -125,11 +125,12 @@ class PayoneApiService
         $reuestUrl = 'https://unknown.url';
         $this->pcpApiLog($requestType, $reuestUrl, $requestJson, $responseJson, $responseCode, $merchantReference);
 
-
+        Registry::getLogger()->error('Saved commerce case id ' . $response->getCommerceCaseId() . ' and checkout id ' . $response->getCheckout()->getCheckoutId() . ' with merchant reference ' . $merchantReference);
         Registry::getSession()->setVariable('pcpCommerceCaseId', $response->getCommerceCaseId());
         Registry::getSession()->setVariable('pcpCheckoutId', $response->getCheckout()->getCheckoutId());
         Registry::getSession()->setVariable('pcpMerchantReference', $merchantReference);
 
+        Registry::getLogger()->error('Authorization request completed for user ' . $user->oxuser__oxusername->value . ' with commerce case id ' . $response->getCommerceCaseId());
         return $response;
     }
 

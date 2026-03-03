@@ -12,6 +12,7 @@ use Payone\PcpPrototype\Core\PayoneApiService;
 use PayoneCommercePlatform\Sdk\Models\ActionType;
 use PayoneCommercePlatform\Sdk\Models\CompletePaymentResponse;
 use PayoneCommercePlatform\Sdk\Models\CreateCommerceCaseResponse;
+use PayoneCommercePlatform\Sdk\Models\StatusValue;
 
 class Order extends Order_parent
 {
@@ -107,15 +108,16 @@ class Order extends Order_parent
         $this->oxorder__oxdelsal = new Field('');
     }
 
-    protected function pcpHandleAuthorizationResponse(CreateCommerceCaseResponse | CompletePaymentResponse $response, $payGateway, $dynValue): bool
+    protected function pcpHandleAuthorizationResponse(CreateCommerceCaseResponse | CompletePaymentResponse | null $response, $payGateway, $dynValue): bool
     {
+        Registry::getLogger()->error('Handling authorization response: ' . ($response ? get_class($response) : 'null'));
         if ($response === null) {
             Registry::getLogger()->error('Authorization response is null');
             return false;
         }
 
         $aSessionData = $this->extractResponseDataForSession($response, $dynValue);
-
+        Registry::getLogger()->error('Extracted session data: ' . print_r($aSessionData, true));
         Registry::getSession()->setVariable('pcpOrderResponse', $aSessionData);
         Registry::getSession()->setVariable('pcpOrderId', $this->getId());
         $this->pcpSaveResponseReferences($aSessionData);
@@ -128,14 +130,17 @@ class Order extends Order_parent
         $checkout = $response->getCheckout();
 
         if ($checkout !== null && $checkout->getErrorResponse() !== null) {
+            Registry::getLogger()->error('Authorization response contains errors: ' . print_r($checkout->getErrorResponse()->getErrors(), true));
             return false;
         }
 
         if ($checkout !== null && $checkout->getPaymentResponse() !== null) {
+            Registry::getLogger()->error('Authorization response contains payment response');
             $paymentResponse = $checkout->getPaymentResponse();
 
             $merchantAction = $paymentResponse->getMerchantAction();
             if ($merchantAction !== null && $merchantAction->getActionType() === ActionType::REDIRECT) {
+                Registry::getLogger()->error('Authorization response requires redirect to: ' . $merchantAction->getRedirectData()->getRedirectURL());
                 $redirectUrl = $merchantAction->getRedirectData()->getRedirectURL();
                 $this->pcpHandleAuthorizationRedirect($redirectUrl);
                 return false;
@@ -143,25 +148,29 @@ class Order extends Order_parent
 
             $payment = $paymentResponse->getPayment();
             if ($payment !== null && $payment->getStatus() === 'PENDING_CAPTURE') {
+                Registry::getLogger()->error('Authorization response payment status is PENDING_CAPTURE');
                 return true;
             }
         }
 
         if ($this->isSuccessfulOrderCompleteResponse($response)) {
+            Registry::getLogger()->error('Authorization response is successful order complete response');
             return true;
         }
 
         if ($this->isReservedForPaymentInStore($response)) {
+            Registry::getLogger()->error('Authorization response is reserved for payment in store');
             return true;
         }
 
+        Registry::getLogger()->error('Authorization response did not match any successful conditions');
         return false;
     }
 
-    protected function isReservedForPaymentInStore($response): bool
+    protected function isReservedForPaymentInStore(CreateCommerceCaseResponse $response): bool
     {
-        $sPaymentId = $this->oxorder__oxpaymenttype->value;
-        if ($sPaymentId !== 'pcppayinstore') {
+        $paymentId = $this->oxorder__oxpaymenttype->value;
+        if ($paymentId !== 'pcppayinstore') {
             return false;
         }
 
@@ -178,19 +187,23 @@ class Order extends Order_parent
         return $statusOutput->getPaymentStatus() === 'WAITING_FOR_PAYMENT';
     }
 
-    protected function isSuccessfulOrderCompleteResponse($response): bool
+    protected function isSuccessfulOrderCompleteResponse(CreateCommerceCaseResponse $response): bool
     {
+        Registry::getLogger()->error('Checking if response is successful order complete response');
         $checkout = $response->getCheckout();
         if ($checkout === null || $checkout->getPaymentResponse() === null) {
+            Registry::getLogger()->error('Checkout or payment response is null');
             return false;
         }
 
         $payment = $checkout->getPaymentResponse()->getPayment();
         if ($payment === null) {
+            Registry::getLogger()->error('Payment is null');
             return false;
         }
 
-        return $payment->getStatus() === 'PENDING_CAPTURE';
+        Registry::getLogger()->error('Payment status: ' . print_r($payment->getStatus(), true));
+        return $payment->getStatus() === StatusValue::PENDING_CAPTURE;
     }
 
     protected function extractResponseDataForSession(CreateCommerceCaseResponse | CompletePaymentResponse $response, $dynValue): array
@@ -198,7 +211,7 @@ class Order extends Order_parent
         $data = [];
 
         if ($response instanceof CompletePaymentResponse) {
-            Registry::getLogger()->info('Response of request is of type complete request');
+            Registry::getLogger()->error('Response of request is of type complete request');
             $data['commerceCaseId'] = Registry::getSession()->getVariable('bnplInstallmentCommerceCaseId');
             $checkoutId = Registry::getSession()->getVariable('bnplInstallmentCheckoutId');
             $data['merchantReference'] = $dynValue['pcp_merchant_reference'];
@@ -257,7 +270,7 @@ class Order extends Order_parent
         }
 
         $sRemark = implode(' | ', $aParts);
-
+        Registry::getLogger()->error('Saving authorization response references in order remark: ' . $sRemark);
         if ($sRemark) {
             $this->oxorder__oxremark = new Field($sRemark, Field::T_RAW);
             $this->save();
