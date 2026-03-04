@@ -113,6 +113,15 @@ class ModuleConfigController extends ModuleConfigController_parent
             'pic2' => 'Shopper_2.jpg',
             'pic3' => 'Shopper_3.jpg',
         ],
+        '5' => [
+            'title' => 'PAYONE Patsy',
+            'artnum' => 'payone5',
+            'longdesc' => "The ultimate PAYONE Automated Testing System Patsy\nGet it today to improve your productivity by a lot!\nAsk Team Integrations for more details ;)\n",
+            'price' => 1999,
+            'pic1' => 'Patsy_1.jpg',
+            'pic2' => 'Patsy_2.jpg',
+            'pic3' => 'Patsy_3.jpg',
+        ],
     ];
 
     protected static array $aPcpSeoSettings = [
@@ -130,6 +139,30 @@ class ModuleConfigController extends ModuleConfigController_parent
             'frontpage_meta_description' => 'PAYONE goes Omnichannel with our Commerce-Platform',
             'frontpage_meta_keywords' => 'omnichannel, payone, demo, store, payone-commerce-platform, seamless',
         ],
+    ];
+
+    protected static string $demoTextBlockContentTemplateEnglish = '
+        <div class="d-flex flex-column row-spacer justify-content-between align-items-center">
+            <h1 class="primary-color">Your content here</h1>
+            <div>
+                Edit ident <strong>%s</strong> to configure this text block to your needs or to deactivate it entirely.
+            </div>
+        </div>';
+
+    protected static string $demoTextBlockContentTemplateGerman = '
+        <div class="d-flex flex-column row-spacer justify-content-between align-items-center">
+            <h1 class="primary-color">Ihr Inhalt hier</h1>
+            <div>
+                Editiereden Eintrag mit Ident <strong>%s</strong> um diesen Text-Block nach deinen Wünschen anzupassen oder ihn komplett zu daektivieren.
+            </div>
+        </div>';
+
+    protected static array $demoTextBlocks = [
+        'oxstartslot1',
+        'oxstartslot2',
+        'oxstartslot3',
+        'oxstartslot4',
+        'pcpstartgreeter',
     ];
 
     public function render()
@@ -153,6 +186,8 @@ class ModuleConfigController extends ModuleConfigController_parent
         $this->pcpGenerateDemoArticles();
         $this->pcpGenerateDeliveryCostConfiguration();
         $this->pcpSetSeo();
+        $this->pcpSetTextBlocks();
+        $this->pcpAddBannerToStartPage();
         $this->pcpSetPaymentMinAmount('pcpsecureinstallment', 300);
 
         $this->saveConfVars();
@@ -279,6 +314,30 @@ class ModuleConfigController extends ModuleConfigController_parent
         );
     }
 
+    protected function pcpSetTextBlocks()
+    {
+        foreach (self::$demoTextBlocks as $ident) {
+            $contentDE = sprintf(self::$demoTextBlockContentTemplateGerman, $ident);
+            $contentEN = sprintf(self::$demoTextBlockContentTemplateEnglish, $ident);
+
+            $db = DatabaseProvider::getDb();
+            $query = sprintf(
+                "SELECT OXID FROM %s WHERE OXLOADID='%s' LIMIT 1;",
+                self::$sContentsTable,
+                $ident
+            );
+            $result = $db->getRow($query);
+
+            if ($result) {
+                $this->updateContentTable($ident, $contentDE, $contentEN);
+            } else {
+                $this->insertContent($ident, '', $contentDE, $contentEN);
+            }
+        }
+        $sMessage = "Text blocks have been updated...<br>";
+        $this->_aViewData['pcpResultMessage'] .= $sMessage;
+    }
+
     protected function updateContentTable(string $sLoadId, string $sContentDE, string $sContentEN): void
     {
         $sQuery = sprintf(
@@ -289,6 +348,24 @@ class ModuleConfigController extends ModuleConfigController_parent
             $sLoadId
         );
         DatabaseProvider::getDb()->execute($sQuery);
+    }
+
+    protected function insertContent(string $loadId, string $title, string $contentDE, string $contentEN): void
+    {
+        $query = sprintf(
+            "
+                INSERT INTO %s 
+                    (OXID, OXLOADID, OXSHOPID, OXSNIPPET, OXTYPE, OXACTIVE, OXACTIVE_1, OXPOSITION, OXTITLE, OXCONTENT, OXTITLE_1, OXCONTENT_1) 
+                VALUES 
+                    ('%s', '%s', 1, 1, 0, 1, 0, '', '%s', '%s', '%s', '%s');",
+            self::$sContentsTable,
+            md5($loadId),
+            $loadId,
+            $title,
+            $contentDE,
+            $contentEN
+        );
+        DatabaseProvider::getDb()->execute($query);
     }
 
     protected function deactivateAllDeliveryTypes(): void
@@ -450,5 +527,20 @@ class ModuleConfigController extends ModuleConfigController_parent
             }
             copy($sSrcFile, $sTgtFile);
         }
+    }
+
+    protected function pcpAddBannerToStartPage()
+    {
+        $oActions = oxNew(\OxidEsales\Eshop\Application\Model\Actions::class);
+        $oActions->setId('pcpbanner');
+        $oActions->oxactions__oxshopid = new Field(1);
+        $oActions->oxactions__oxtype = new Field(3);
+        $oActions->oxactions__oxtitle = new Field('Banner 1');
+        $oActions->oxactions__oxactive = new Field(1);
+        $oActions->oxactions__oxpic1 = new Field('payone_banner_1.png');
+        $oActions->save();
+
+        $message = "Banner has been added to the start page...<br>";
+        $this->_aViewData['pcpResultMessage'] .= $message;
     }
 }
