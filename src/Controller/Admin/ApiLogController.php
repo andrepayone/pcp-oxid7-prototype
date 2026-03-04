@@ -10,17 +10,17 @@ use Payone\PcpPrototype\Model\ApiLog;
 
 class ApiLogController extends AdminDetailsController
 {
-    protected $_sThisTemplate = 'pcp_apilog';
+    protected $_sThisTemplate = '@PayonePcpPrototype/admin/pcp_apilog';
 
     public function render()
     {
         parent::render();
 
-        $sOxid = Registry::getRequest()->getRequestParameter('oxid');
-        if ($sOxid != '-1' && isset($sOxid)) {
-            $oLogEntry = oxNew(ApiLog::class);
-            $oLogEntry->load($sOxid);
-            $this->_aViewData['edit'] = $oLogEntry;
+        $oxId = Registry::getRequest()->getRequestParameter('oxid');
+        if ($oxId != '-1' && isset($oxId)) {
+            $logEntry = oxNew(ApiLog::class);
+            $logEntry->load($oxId);
+            $this->_aViewData['edit'] = $logEntry;
         }
 
         return $this->_sThisTemplate;

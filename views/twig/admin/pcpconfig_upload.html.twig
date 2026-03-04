@@ -23,9 +23,9 @@
 <div>
     <form name="pcpShopLogoForm" id="pcpShopLogoForm" enctype="multipart/form-data" action="{{ oViewConf.getSelfLink()|raw }}" method="post">
         <input type="hidden" name="MAX_FILE_SIZE" value="{{ iMaxUploadFileSize }}">
-        {{ oViewConf.getHiddenSid() }}
-        <input type="hidden" name="oxid" value="[{$oxid}]">
-        <input type="hidden" name="cl" value="ConfigUploadController">
+        {{ oViewConf.getHiddenSid()|raw }}
+        <input type="hidden" name="oxid" value="{{ oxid }}">
+        <input type="hidden" name="cl" value="PcpConfigUploadController">
         <input type="hidden" name="fnc" value="pcpUploadShopLogo">
         <table style="border: 0;">
             <tr>
@@ -35,7 +35,7 @@
                 <td>
                     {% set customShopLogo = oView.pcpGetCustomShopLogo() %}
                     {% if customShopLogo %}
-                        <img class="picPreview" src="{{ customShopLogo }}">
+                        <img class="picPreview" src="../{{ customShopLogo }}">
                     {% endif %}
                 </td>
             </tr>

@@ -19,7 +19,7 @@
 
 <div id="liste">
     <form autocomplete="off" name="search" id="search" action="{{ oViewConf.getSelfLink() }}" method="post">
-        {% include "_formparams.html.twig" with {'cl': 'FcPayOneApiLogList', 'lstrt': lstrt, 'actedit': actedit, 'oxid': oxid, 'language': actlang, 'editlanguage':actlang } %}
+        {% include "_formparams.html.twig" with {'cl': 'PcpApiLogListController', 'lstrt': lstrt, 'actedit': actedit, 'oxid': oxid, 'language': actlang, 'editlanguage':actlang } %}
 
         <table cellspacing="0" cellpadding="0" border="0" width="100%">
             <colgroup>
@@ -60,10 +60,10 @@
                 </td>
             </tr>
             <tr>
-                <td class="listheader first" height="15">&nbsp;<a href="Javascript:top.oxid.admin.setSorting( document.search, 'pcpapilog', 'pcp_timestamp', 'asc');document.search.submit();" class="listheader">[{oxmultilang ident="PCP_LIST_HEADER_TIMESTAMP"}]</a></td>
-                <td class="listheader"><a href="Javascript:top.oxid.admin.setSorting( document.search, 'pcpapilog', 'pcp_requesttype', 'asc');document.search.submit();" class="listheader">[{oxmultilang ident="PCP_LIST_HEADER_REQUESTTYPE"}]</a></td>
-                <td class="listheader"><a href="Javascript:top.oxid.admin.setSorting( document.search, 'pcpapilog', 'pcp_refnr', 'asc');document.search.submit();" class="listheader">[{oxmultilang ident="PCP_LIST_HEADER_REFERENCE"}]</a></td>
-                <td class="listheader"><a href="Javascript:top.oxid.admin.setSorting( document.search, 'pcpapilog', 'pcp_response_httpcode', 'asc');document.search.submit();" class="listheader">[{oxmultilang ident="PCP_LIST_RESPONSE_HTTPCODE"}]</a></td>
+                <td class="listheader first" height="15">&nbsp;<a href="Javascript:top.oxid.admin.setSorting( document.search, 'pcpapilog', 'pcp_timestamp', 'asc');document.search.submit();" class="listheader">{{ translate({ ident: "PCP_LIST_HEADER_TIMESTAMP" }) }}</a></td>
+                <td class="listheader"><a href="Javascript:top.oxid.admin.setSorting( document.search, 'pcpapilog', 'pcp_requesttype', 'asc');document.search.submit();" class="listheader">{{ translate({ ident: "PCP_LIST_HEADER_REQUESTTYPE" }) }}</a></td>
+                <td class="listheader"><a href="Javascript:top.oxid.admin.setSorting( document.search, 'pcpapilog', 'pcp_refnr', 'asc');document.search.submit();" class="listheader">{{ translate({ ident: "PCP_LIST_HEADER_REFERENCE" }) }}</a></td>
+                <td class="listheader"><a href="Javascript:top.oxid.admin.setSorting( document.search, 'pcpapilog', 'pcp_response_httpcode', 'asc');document.search.submit();" class="listheader">{{ translate({ ident: "PCP_LIST_RESPONSE_HTTPCODE" }) }}</a></td>
             </tr>
 
             {% set blWhite = "" %}
@@ -81,24 +81,24 @@
                     {% endif %}
                     <td valign="top" class="{{  listclass }}" height="15">
                         <div class="listitemfloating">&nbsp;<a
-                                    href="Javascript:top.oxid.admin.editThis('{{  listitem.pcpapilog__oxid.value|raw }}');"
-                                    class="{{  listclass }}">{{  listitem.pcpapilog__pcp_timestamp.value|raw }}</a></div>
+                                    href="Javascript:top.oxid.admin.editThis('{{ listitem.pcpapilog__oxid.value|raw }}');"
+                                    class="{{ listclass }}">{{ listitem.pcpapilog__pcp_timestamp.value|raw }}</a></div>
                     </td>
-                    <td valign="top" class="{{  listclass }}">
+                    <td valign="top" class="{{ listclass }}">
+                        <div class="listitemfloating"><a
+                                    href="Javascript:top.oxid.admin.editThis('{{ listitem.pcpapilog__oxid.value|raw }}');"
+                                    class="{{ listclass }}">{{ listitem.pcpapilog__pcp_requesttype.valu|raw }}</a></div>
+                    </td>
+                    <td valign="top" class="{{ listclass }}">
                         <div class="listitemfloating"><a
                                     href="Javascript:top.oxid.admin.editThis('{{  listitem.pcpapilog__oxid.value|raw }}');"
-                                    class="{{  listclass }}">{{ listitem.pcpapilog__pcp_requesttype.valu|raw }}</a></div>
-                    </td>
-                    <td valign="top" class="{{  listclass }}">
-                        <div class="listitemfloating"><a
-                                    href="Javascript:top.oxid.admin.editThis('{{  listitem.pcpapilog__oxid.value|raw }}');"
-                                    class="{{  listclass }}">{{  listitem.pcpapilog__pcp_refnr.value|raw }}</a>
+                                    class="{{ listclass }}">{{ listitem.pcpapilog__pcp_refnr.value|raw }}</a>
                         </div>
                     </td>
-                    <td valign="top" class="{{  listclass }}">
+                    <td valign="top" class="{{ listclass }}">
                         <div class="listitemfloating"><a
                                     href="Javascript:top.oxid.admin.editThis('{{  listitem.pcpapilog__oxid.value|raw }}');"
-                                    class="{{  listclass }}">{{  listitem.pcpapilog__pcp_response_httpcode.value|raw }}</a>
+                                    class="{{ listclass }}">{{ listitem.pcpapilog__pcp_response_httpcode.value|raw }}</a>
                         </div>
                     </td>
                     <td class="{{  listclass }}"></td>

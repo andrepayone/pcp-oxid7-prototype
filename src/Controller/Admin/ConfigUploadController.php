@@ -9,7 +9,7 @@ use OxidEsales\Eshop\Core\Registry;
 
 class ConfigUploadController extends AdminDetailsController
 {
-    protected $_sThisTemplate = 'pcpconfig_upload';
+    protected $_sThisTemplate = '@PayonePcpPrototype/admin/pcpconfig_upload';
 
     public function render()
     {
@@ -23,8 +23,8 @@ class ConfigUploadController extends AdminDetailsController
 
     public function pcpUploadShopLogo(): void
     {
-        $aFiles = $_FILES;
-        if (!isset($aFiles['pcpShopLogo']['name'])) {
+        $files = $_FILES;
+        if (!isset($files['pcpShopLogo']['name'])) {
             return;
         }
 
@@ -39,8 +39,8 @@ class ConfigUploadController extends AdminDetailsController
             mkdir($sTargetPath, 0777, true);
         }
 
-        $sUploadedImageFileName = basename($aFiles['pcpShopLogo']['name']);
-        $sTmpFile = $aFiles['pcpShopLogo']['tmp_name'];
+        $sUploadedImageFileName = basename($files['pcpShopLogo']['name']);
+        $sTmpFile = $files['pcpShopLogo']['tmp_name'];
         $sTmpTarget = sprintf('%s/%s', $sTargetPath, $sUploadedImageFileName);
         $sImageFileType = strtolower(pathinfo($sTmpTarget, PATHINFO_EXTENSION));
 
@@ -56,6 +56,7 @@ class ConfigUploadController extends AdminDetailsController
         }
 
         $sCopyTarget = sprintf('%s/%s', $sTargetPath, 'shop_logo.' . $sImageFileType);
+        Registry::getLog()->notice(sprintf('Moving uploaded file from %s to %s', $sTmpFile, $sCopyTarget));
         if (move_uploaded_file($sTmpFile, $sCopyTarget)) {
             $this->_aViewData['pcpResultMessage'] = sprintf(
                 'The file %s has been uploaded and moved to %s',
