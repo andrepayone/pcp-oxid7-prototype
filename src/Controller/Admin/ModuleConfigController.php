@@ -26,6 +26,9 @@ class ModuleConfigController extends ModuleConfigController_parent
         'Shopper_1.jpg',
         'Shopper_2.jpg',
         'Shopper_3.jpg',
+        'Patsy_1.png',
+        'Patsy_2.png',
+        'Patsy_3.png',
     ];
 
     protected static array $aDeliveryConfig = [
@@ -118,9 +121,9 @@ class ModuleConfigController extends ModuleConfigController_parent
             'artnum' => 'payone5',
             'longdesc' => "The ultimate PAYONE Automated Testing System Patsy\nGet it today to improve your productivity by a lot!\nAsk Team Integrations for more details ;)\n",
             'price' => 1999,
-            'pic1' => 'Patsy_1.jpg',
-            'pic2' => 'Patsy_2.jpg',
-            'pic3' => 'Patsy_3.jpg',
+            'pic1' => 'Patsy_1.png',
+            'pic2' => 'Patsy_2.png',
+            'pic3' => 'Patsy_3.png',
         ],
     ];
 
@@ -153,7 +156,7 @@ class ModuleConfigController extends ModuleConfigController_parent
         <div class="d-flex flex-column row-spacer justify-content-between align-items-center">
             <h1 class="primary-color">Ihr Inhalt hier</h1>
             <div>
-                Editiereden Eintrag mit Ident <strong>%s</strong> um diesen Text-Block nach deinen Wünschen anzupassen oder ihn komplett zu daektivieren.
+                Editiere Eintrag mit Ident <strong>%s</strong> um diesen Text-Block nach deinen Wünschen anzupassen oder ihn komplett zu deaktivieren.
             </div>
         </div>';
 
@@ -174,8 +177,8 @@ class ModuleConfigController extends ModuleConfigController_parent
             $this->_aViewData['isPcpDemoModule'] = true;
 
             $aConfigBools = $this->_aViewData['confbools'];
-            $blShowDemoShopButton = (bool) ($aConfigBools['pcpShowDemoShopButton'] ?? false);
-            $this->_aViewData['showDemoShopButton'] = $blShowDemoShopButton;
+            $showDemoShopButton = (bool) ($aConfigBools['pcpShowDemoShopButton'] ?? false);
+            $this->_aViewData['showDemoShopButton'] = $showDemoShopButton;
         }
 
         return $render;
@@ -363,6 +366,7 @@ class ModuleConfigController extends ModuleConfigController_parent
             $loadId,
             $title,
             $contentDE,
+            $title,
             $contentEN
         );
         DatabaseProvider::getDb()->execute($query);
@@ -493,9 +497,9 @@ class ModuleConfigController extends ModuleConfigController_parent
 
     protected function copyArticleDemoPictures(): void
     {
-        $sModuleDir = Registry::get(ViewConfig::class)->getModulePath('PayonePcpPrototype');
-        $sSourcePath = $sModuleDir . 'out/pictures/products';
-        $sTargetPath = Registry::getConfig()->getConfigParam('sShopDir') . 'out/pictures/master/product';
+        $shopDir = Registry::getConfig()->getConfigParam('sShopDir');
+        $sSourcePath = $shopDir . 'out/modules/PayonePcpPrototype/out/pictures/products';
+        $sTargetPath = $shopDir . 'out/pictures/master/product';
 
         foreach (self::$aProductPictures as $sPic) {
             $aSplitPicName = explode('_', $sPic);
@@ -507,9 +511,12 @@ class ModuleConfigController extends ModuleConfigController_parent
             $sCopyTarget = sprintf('%s/%s/%s', $sTargetPath, $sPicNr, $sPic);
             Registry::getLogger()->error(sprintf('Copying demo product picture from %s to %s', $sCopySource, $sCopyTarget));
             if (file_exists($sCopySource)) {
+                Registry::getLogger()->error(sprintf('Source file exists, copying now...'));
                 if (!file_exists(dirname($sCopyTarget))) {
+                    Registry::getLogger()->error(sprintf('Target directory %s does not exist, creating now...', dirname($sCopyTarget)));
                     mkdir(dirname($sCopyTarget), 0777, true);
                 }
+                Registry::getLogger()->error(sprintf('Copying file now...'));
                 copy($sCopySource, $sCopyTarget);
             }
         }
@@ -517,9 +524,9 @@ class ModuleConfigController extends ModuleConfigController_parent
 
     protected function copyFavIcon(): void
     {
-        $sModuleDir = Registry::get(ViewConfig::class)->getModulePath('PayonePcpPrototype');
-        $sSrcFile = $sModuleDir . 'out/img/favicon.ico';
-        $sTgtFile = Registry::getConfig()->getConfigParam('sShopDir') . 'out/apex/img/favicons/favicon.ico';
+        $shopDir = Registry::getConfig()->getConfigParam('sShopDir');
+        $sSrcFile = $shopDir . 'out/modules/PayonePcpPrototype/img/favicon.ico';
+        $sTgtFile = $shopDir . 'out/apex/img/favicons/favicon.ico';
 
         if (file_exists($sSrcFile)) {
             if (!file_exists(dirname($sTgtFile))) {
@@ -529,16 +536,27 @@ class ModuleConfigController extends ModuleConfigController_parent
         }
     }
 
-    protected function pcpAddBannerToStartPage()
+    protected function pcpAddBannerToStartPage(): void
     {
-        $oActions = oxNew(\OxidEsales\Eshop\Application\Model\Actions::class);
-        $oActions->setId('pcpbanner');
-        $oActions->oxactions__oxshopid = new Field(1);
-        $oActions->oxactions__oxtype = new Field(3);
-        $oActions->oxactions__oxtitle = new Field('Banner 1');
-        $oActions->oxactions__oxactive = new Field(1);
-        $oActions->oxactions__oxpic1 = new Field('payone_banner_1.png');
-        $oActions->save();
+        $shopDir = Registry::getConfig()->getConfigParam('sShopDir');
+        $srcFile = $shopDir . 'out/modules/PayonePcpPrototype/out/pictures/promo/payone_banner_1.png';
+        $tgtFile = $shopDir . 'out/pictures/promo/payone_banner_1.png';
+        Registry::getLogger()->error(sprintf('Copying banner picture from %s to %s', $srcFile, $tgtFile));
+        if (file_exists($srcFile)) {
+            if (!file_exists(dirname($tgtFile))) {
+                mkdir(dirname($tgtFile), 0777, true);
+            }
+            copy($srcFile, $tgtFile);
+        }
+
+        $actions = oxNew(\OxidEsales\Eshop\Application\Model\Actions::class);
+        $actions->setId('pcpbanner');
+        $actions->oxactions__oxshopid = new Field(1);
+        $actions->oxactions__oxtype = new Field(3);
+        $actions->oxactions__oxtitle = new Field('Banner 1');
+        $actions->oxactions__oxactive = new Field(1);
+        $actions->oxactions__oxpic = new Field('payone_banner_1.png');
+        $actions->save();
 
         $message = "Banner has been added to the start page...<br>";
         $this->_aViewData['pcpResultMessage'] .= $message;
