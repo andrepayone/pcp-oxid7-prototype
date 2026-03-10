@@ -498,26 +498,29 @@ class ModuleConfigController extends ModuleConfigController_parent
     protected function copyArticleDemoPictures(): void
     {
         $shopDir = Registry::getConfig()->getConfigParam('sShopDir');
-        $sSourcePath = $shopDir . 'out/modules/PayonePcpPrototype/out/pictures/products';
-        $sTargetPath = $shopDir . 'out/pictures/master/product';
+        $sourcePath = $shopDir . 'out/modules/PayonePcpPrototype/out/pictures/products';
+        $targetPath = $shopDir . 'out/pictures/master/product';
 
         foreach (self::$aProductPictures as $sPic) {
-            $aSplitPicName = explode('_', $sPic);
-            $sPicLastPart = (string) $aSplitPicName[count($aSplitPicName) - 1];
-            $aSplitPicLastPart = explode('.', $sPicLastPart);
-            $sPicNr = (string) $aSplitPicLastPart[0];
+            $splitPicName = explode('_', $sPic);
+            $picLastPart = (string) $splitPicName[count($splitPicName) - 1];
+            $splitPicLastPart = explode('.', $picLastPart);
+            $picNr = (string) $splitPicLastPart[0];
 
-            $sCopySource = sprintf('%s/%s', $sSourcePath, $sPic);
-            $sCopyTarget = sprintf('%s/%s/%s', $sTargetPath, $sPicNr, $sPic);
-            Registry::getLogger()->error(sprintf('Copying demo product picture from %s to %s', $sCopySource, $sCopyTarget));
-            if (file_exists($sCopySource)) {
+            $copySource = sprintf('%s/%s', $sourcePath, $sPic);
+            $copyTarget = sprintf('%s/%s/%s', $targetPath, $picNr, $sPic);
+            Registry::getLogger()->error(sprintf('Copying demo product picture from %s to %s', $copySource, $copyTarget));
+            if (file_exists($copySource)) {
                 Registry::getLogger()->error(sprintf('Source file exists, copying now...'));
-                if (!file_exists(dirname($sCopyTarget))) {
-                    Registry::getLogger()->error(sprintf('Target directory %s does not exist, creating now...', dirname($sCopyTarget)));
-                    mkdir(dirname($sCopyTarget), 0777, true);
+                if (!file_exists(dirname($copyTarget))) {
+                    Registry::getLogger()->error(sprintf('Target directory %s does not exist, creating now...', dirname($copyTarget)));
+                    mkdir(dirname($copyTarget), 0777, true);
                 }
                 Registry::getLogger()->error(sprintf('Copying file now...'));
-                copy($sCopySource, $sCopyTarget);
+                $success = copy($copySource, $copyTarget);
+                if (!$success) {
+                    Registry::getLogger()->error(sprintf('Error copying file from %s to %s', $copySource, $copyTarget));
+                }
             }
         }
     }
@@ -528,11 +531,17 @@ class ModuleConfigController extends ModuleConfigController_parent
         $sSrcFile = $shopDir . 'out/modules/PayonePcpPrototype/img/favicon.ico';
         $sTgtFile = $shopDir . 'out/apex/img/favicons/favicon.ico';
 
+        Registry::getLogger()->error(sprintf('Copying favicon from %s to %s', $sSrcFile, $sTgtFile));
         if (file_exists($sSrcFile)) {
+            Registry::getLogger()->error(sprintf('Source file exists, copying now...'));
             if (!file_exists(dirname($sTgtFile))) {
+                Registry::getLogger()->error(sprintf('Target directory %s does not exist, creating now...', dirname($sTgtFile)));
                 mkdir(dirname($sTgtFile), 0777, true);
             }
-            copy($sSrcFile, $sTgtFile);
+            $success = copy($sSrcFile, $sTgtFile);
+            if (!$success) {
+                Registry::getLogger()->error(sprintf('Error copying file from %s to %s', $sSrcFile, $sTgtFile));
+            }
         }
     }
 
@@ -546,7 +555,10 @@ class ModuleConfigController extends ModuleConfigController_parent
             if (!file_exists(dirname($tgtFile))) {
                 mkdir(dirname($tgtFile), 0777, true);
             }
-            copy($srcFile, $tgtFile);
+            $success = copy($srcFile, $tgtFile);
+            if (!$success) {
+                Registry::getLogger()->error(sprintf('Error copying file from %s to %s', $srcFile, $tgtFile));
+            }
         }
 
         $actions = oxNew(\OxidEsales\Eshop\Application\Model\Actions::class);
