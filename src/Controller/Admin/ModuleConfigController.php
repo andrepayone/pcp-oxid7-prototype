@@ -215,8 +215,8 @@ class ModuleConfigController extends ModuleConfigController_parent
     protected function pcpGenerateDemoArticles(): void
     {
         try {
-            $this->copyArticleDemoPictures();
             $this->deleteAllExistingProductData();
+            $this->copyArticleDemoPictures();
             $this->createPcpDemoArticles();
             $sMessage = "Existing articles have been deleted and demo articles have been generated...<br>";
         } catch (\Exception $e) {
@@ -509,14 +509,14 @@ class ModuleConfigController extends ModuleConfigController_parent
 
             $copySource = sprintf('%s/%s', $sourcePath, $sPic);
             $copyTarget = sprintf('%s/%s/%s', $targetPath, $picNr, $sPic);
-            Registry::getLogger()->error(sprintf('Copying demo product picture from %s to %s', $copySource, $copyTarget));
+            Registry::getLogger()->error(sprintf('Check copy file from %s to %s', $copySource, $copyTarget));
             if (file_exists($copySource)) {
                 Registry::getLogger()->error(sprintf('Source file exists, copying now...'));
                 if (!file_exists(dirname($copyTarget))) {
                     Registry::getLogger()->error(sprintf('Target directory %s does not exist, creating now...', dirname($copyTarget)));
                     mkdir(dirname($copyTarget), 0777, true);
                 }
-                Registry::getLogger()->error(sprintf('Copying file now...'));
+                Registry::getLogger()->error(sprintf('Copying file now from %s to %s', $copySource, $copyTarget));
                 $success = copy($copySource, $copyTarget);
                 if (!$success) {
                     Registry::getLogger()->error(sprintf('Error copying file from %s to %s', $copySource, $copyTarget));
