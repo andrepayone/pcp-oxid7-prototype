@@ -65,5 +65,6 @@ $aLang = [
     'COPY_REQUEST_TO_CLIPBOARD'                 => 'Copy request into clipboard',
     'COPY_RESPONSE_TO_CLIPBOARD'                => 'Copy response into clipboard',
     'PCP_UPLOAD'                                => 'Upload',
+    'PCP_CLEAR_CACHE'                           => 'Clear template caches',
 ];
 

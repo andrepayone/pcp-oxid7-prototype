@@ -203,6 +203,13 @@ class ModuleConfigController extends ModuleConfigController_parent
         $this->render();
     }
 
+    public function pcpClearCache(): void
+    {
+        $output = shell_exec(VENDOR_PATH . '/bin/oe-console oe:cache:clear');
+        $sMessage = "Cache has been cleared...<br>". "Console output: " . print_r($output, true);
+        $this->_aViewData['pcpResultMessage'] .= $sMessage;
+    }
+
     protected function pcpSetSeo(): void
     {
         try {

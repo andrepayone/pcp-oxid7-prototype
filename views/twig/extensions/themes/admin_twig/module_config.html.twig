@@ -8,6 +8,24 @@
         <hr id="pcp_setup_result_message">
     {% endif %}
 
+    {% if isPcpDemoModule %}
+        <div>
+            <input
+                    type="submit"
+                    class="confinput"
+                    name="clear_cache"
+                    value="{{ translate({ ident: "PCP_CLEAR_CACHE" }) }}"
+                    onClick="triggerClearTmp()"
+                    {{ readonly }}
+            >
+            <script>
+                function triggerClearTmp() {
+                    document.module_configuration.fnc.value='pcpClearCache'
+                }
+            </script>
+        </div>
+        <hr>
+    {% endif %}
     {% if isPcpDemoModule and showDemoShopButton %}
         <div>
             <input

@@ -65,4 +65,5 @@ $aLang = [
     'COPY_REQUEST_TO_CLIPBOARD'                 => 'Anfrage in die Zwischenablage kopieren',
     'COPY_RESPONSE_TO_CLIPBOARD'                => 'Antwort in die Zwischenablage kopieren',
     'PCP_UPLOAD'                                => 'Upload',
+    'PCP_CLEAR_CACHE'                           => 'Template-Caches leeren',
 ];
