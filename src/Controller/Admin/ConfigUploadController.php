@@ -56,7 +56,7 @@ class ConfigUploadController extends AdminDetailsController
         }
 
         $sCopyTarget = sprintf('%s/%s', $sTargetPath, 'shop_logo.' . $sImageFileType);
-        Registry::getLog()->notice(sprintf('Moving uploaded file from %s to %s', $sTmpFile, $sCopyTarget));
+        Registry::getLogger()->error(sprintf('Moving uploaded file from %s to %s', $sTmpFile, $sCopyTarget));
         if (move_uploaded_file($sTmpFile, $sCopyTarget)) {
             $this->_aViewData['pcpResultMessage'] = sprintf(
                 'The file %s has been uploaded and moved to %s',
