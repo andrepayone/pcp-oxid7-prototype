@@ -53,14 +53,14 @@
 {% block checkout_order_btn_confirm_bottom %}
     {% if oView.isPcpPayment() %}
         <div class="mb-3 row">
-            <label class="req col-form-label col-lg-3">{{ translate({ ident: "PCP_MERCHANT_REFERENCE_ORDER" }) }}:</label>
-            <div class="col-lg-9">
+            <label class="req col-form-label col-lg-4">{{ translate({ ident: "PCP_MERCHANT_REFERENCE_ORDER" }) }}:</label>
+            <div class="col-lg-8">
                 <input type="text" class="form-control" size="20" maxlength="20" name="pcp_merchant_reference" value="{{ oView.getPcpMerchantReference() }}">
             </div>
         </div>
         <div class="mb-3 row">
-            <label class="req col-form-label col-lg-3">{{ translate({ ident: "PCP_CHECKOUT_REFERENCE_ORDER" }) }}:</label>
-            <div class="col-lg-9">
+            <label class="req col-form-label col-lg-4">{{ translate({ ident: "PCP_CHECKOUT_REFERENCE_ORDER" }) }}:</label>
+            <div class="col-lg-8">
                 <input type="text" class="form-control" size="20" maxlength="20" name="pcp_checkout_reference" value="{{ oView.getPcpCheckoutReference() }}">
             </div>
         </div>
