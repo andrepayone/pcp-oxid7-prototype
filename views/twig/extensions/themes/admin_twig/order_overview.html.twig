@@ -1,3 +1,5 @@
+{% extends 'order_overview.html.twig' %}
+
 {% block admin_order_overview_send_form %}
     {{ parent() }}
     {% if oView.isPcpPayment() %}
