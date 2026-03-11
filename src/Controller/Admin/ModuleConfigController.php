@@ -148,15 +148,21 @@ class ModuleConfigController extends ModuleConfigController_parent
         <div class="d-flex flex-column row-spacer justify-content-between align-items-center">
             <h1 class="primary-color">Your content here</h1>
             <div>
-                Edit ident <strong>%s</strong> to configure this text block to your needs or to deactivate it entirely.
+                You can edit or deactivate this content.
+            </div>
+            <div>
+                <i>Admin</i> -> <i>Customer Info</i> -> <i>CMS Pages</i> -> <i>Ident: <strong>%s</strong></i>
             </div>
         </div>';
 
     protected static string $demoTextBlockContentTemplateGerman = '
         <div class="d-flex flex-column row-spacer justify-content-between align-items-center">
-            <h1 class="primary-color">Ihr Inhalt hier</h1>
+            <h1 class="primary-color">Dein Inhalt hier</h1>
             <div>
-                Editiere Eintrag mit Ident <strong>%s</strong> um diesen Text-Block nach deinen Wünschen anzupassen oder ihn komplett zu deaktivieren.
+                Du kannst diesen Inhaltsblock nach deinen Wünschen anpassen oder komplett deaktivieren.
+            </div>
+            <div>
+                <i>Admin</i> -> <i>Kundeninformationen</i> -> <i>CMS-Seiten</i> -> <i>Ident: <strong>%s</strong></i>
             </div>
         </div>';
 
