@@ -10,7 +10,41 @@
 }
 
 body {
-    background-color: var(--pcp-bg-color) !important;
+    background: var(--pcp-bg-color) !important;
+}
+
+.header {
+    background: var(--pcp-bg-color) !important;
+}
+
+.header .usp-list .list-inline-item {
+    background: var(--pcp-secondary-color-bright) !important;
+    color: var(--pcp-secondary-color-dark) !important;
+}
+
+.breadcrumb-wrapper {
+    background: var(--pcp-secondary-color-bright) !important;
+}
+
+.modal-body {
+    background: var(--pcp-bg-color) !important;
+}
+
+.details-information {
+    background: var(--pcp-bg-color) !important;
+}
+
+.meta {
+    background: var(--pcp-secondary-color-bright) !important;
+}
+
+.container {
+    background: var(--pcp-bg-color) !important;
+}
+
+.details {
+    background: var(--pcp-bg-color) !important;
+    overflow: hidden;
 }
 
 .usp-list-content {
