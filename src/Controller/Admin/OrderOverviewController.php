@@ -7,15 +7,18 @@ namespace Payone\PcpPrototype\Controller\Admin;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Field;
 use Payone\PcpPrototype\Core\PayoneApiService;
+use Payone\PcpPrototype\Model\Payment;
 use PayoneCommercePlatform\Sdk\Models\CancellationReason;
 use PayoneCommercePlatform\Sdk\Models\StatusCheckout;
 
 class OrderOverviewController extends OrderOverviewController_parent
 {
     protected ?string $sPaymentStatus = null;
-    protected ?string $sCheckoutStatus = null;
+    protected StatusCheckout $sCheckoutStatus = StatusCheckout::OPEN;
     protected ?array $aGeneralStatus = null;
     protected ?array $aTranslatedStatusMessage = null;
+
+    protected ?string $paymentIdent = null;
 
     public function __construct()
     {
@@ -34,6 +37,29 @@ class OrderOverviewController extends OrderOverviewController_parent
                 'OPEN' => $oLang->translateString('PCP_STATUS_OPEN'),
             ],
         ];
+    }
+
+    public function render()
+    {
+        $render = parent::render();
+
+        $this->_aViewData['isPcpPayment'] = false;
+        $this->_aViewData['orderState'] = $this->pcpGetOrderState();
+        $this->_aViewData['captureAllowed'] = $this->pcpCaptureAllowed();
+        $this->_aViewData['refundAllowed'] = $this->pcpRefundAllowed();
+        if ($this->pcpIsPcpPayment()) {
+            $this->_aViewData['isPcpPayment'] = true;
+        }
+
+        return $render;
+    }
+
+    public function pcpIsPcpPayment(): bool
+    {
+        $paymentId = $this->pcpGetPaymentId();
+        if (!$paymentId) return false;
+
+        return Payment::isPcpPaymentType($paymentId);
     }
 
     public function pcpcapture()
@@ -156,6 +182,19 @@ class OrderOverviewController extends OrderOverviewController_parent
             'paymentExecutions' => $paymentExecutions,
             'items' => $shoppingCart !== null ? $shoppingCart->getItems() : [],
         ];
+    }
+
+    protected function pcpGetPaymentId()
+    {
+        if ($this->paymentIdent === null) {
+            $order = oxNew(\OxidEsales\Eshop\Application\Model\Order::class);
+            $id = $this->getEditObjectId();
+            if ($order->load($id)) {
+                $this->paymentIdent = $order->oxorder__oxpaymenttype->value;
+            }
+        }
+
+        return $this->paymentIdent;
     }
 
     protected function displayMessage(string $sMultilangIdent): void

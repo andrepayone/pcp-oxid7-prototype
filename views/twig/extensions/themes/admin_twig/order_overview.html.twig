@@ -2,32 +2,31 @@
 
 {% block admin_order_overview_send_form %}
     {{ parent() }}
-    {% if oView.isPcpPayment() %}
+    {% if isPcpPayment %}
         <tr>
             <td class="edittext"></td>
             <td class="edittext" style="border: 1px #0096d6 solid; padding: 5px;">
                 <div>
-                    <img style="padding-top: 5px;max-width: 100px;" src="{{ oViewConf.getModuleUrl('PayonePcpPrototype', 'assets/out/img/payone_logo.png') }}"/>
+                    <img style="padding-top: 5px;max-width: 100px;" src="{{ oViewConf.getModuleUrl('PayonePcpPrototype', 'img/payone_logo.png') }}"/>
                 </div>
                 <div>
-                    {% set pcpOrderStatus = oView.pcpGetOrderState() %}
-                    {% if pcpOrderStatus %}
+                    {% if orderState %}
                     <table>
                         <tr>
                             <td><b>{{ translate({ ident: "PCP_PAYMENT_STATUS" }) }}:</b></td>
-                            <td>{{ pcpOrderStatus.paymentStatusMessage }}</td>
+                            <td>{{ orderState.paymentStatusMessage }}</td>
                         </tr>
                         <tr>
                             <td><b>{{ translate({ ident: "PCP_ORDER_STATUS" }) }}:</b></td>
-                            <td>{{ pcpOrderStatus.checkoutStatusMessage }}</td>
+                            <td>{{ orderState.checkoutStatusMessage }}</td>
                         </tr>
                     </table>
-                    {% if oView.pcpCaptureAllowed() %}
+                    {% if captureAllowed %}
                     <table>
                         <tr>
                             <td>
-                                <form name="pcpcapture" id="pcpcapture" action="{{ oViewConf.getSelfLink() }}" method="post">
-                                    {{ oViewConf.getHiddenSid() }}
+                                <form name="pcpcapture" id="pcpcapture" action="{{ oViewConf.getSelfLink()|raw }}" method="post">
+                                    {{ oViewConf.getHiddenSid()|raw }}
                                     <input type="hidden" name="cl" value="order_overview">
                                     <input type="hidden" name="fnc" value="pcpcapture">
                                     <input type="hidden" name="oxid" value="{{ oxid }}">
@@ -38,8 +37,8 @@
                         </tr>
                         <tr>
                             <td>
-                                <form name="pcpcancel" id="pcpcancel" action="{{ oViewConf.getSelfLink() }}" method="post">
-                                    {{ oViewConf.getHiddenSid() }}
+                                <form name="pcpcancel" id="pcpcancel" action="{{ oViewConf.getSelfLink()|raw }}" method="post">
+                                    {{ oViewConf.getHiddenSid()|raw }}
                                     <input type="hidden" name="cl" value="order_overview">
                                     <input type="hidden" name="fnc" value="pcpcancel">
                                     <input type="hidden" name="oxid" value="{{ oxid }}">
@@ -53,18 +52,18 @@
                                         <option value="FRAUDULENT">{{ translate({ ident: "PCP_CANCEL_FRAUDULENT" }) }}</option>
                                         <option value="ORDER_SHIPPED_IN_FULL">{{ translate({ ident: "PCP_CANCEL_ORDER_SHIPPED_IN_FULL" }) }}</option>
                                         <option value="AUTOMATED_SHIPMENT_FAILED">{{ translate({ ident: "PCP_CANCEL_AUTOMATED_SHIPMENT_FAILED" }) }}</option>
-                                    </  select>
+                                    </select>
                                 </form>
                             </td>
                         </tr>
                     </table>
                     {% endif %}
-                    {% if oView.pcpRefundAllowed() %}
+                    {% if refundAllowed %}
                     <table>
                         <tr>
                             <td>
-                                <form name="pcprefund" id="pcprefund" action="{{ oViewConf.getSelfLink() }}" method="post">
-                                    {{ oViewConf.getHiddenSid() }}
+                                <form name="pcprefund" id="pcprefund" action="{{ oViewConf.getSelfLink()|raw }}" method="post">
+                                    {{ oViewConf.getHiddenSid()|raw }}
                                     <input type="hidden" name="cl" value="order_overview">
                                     <input type="hidden" name="fnc" value="pcprefund">
                                     <input type="hidden" name="oxid" value="{{ oxid }}">
