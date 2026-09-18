@@ -43,6 +43,12 @@ class Events
             'checked' => 0,
             'sorting' => 4,
         ],
+    ];
+
+    /**
+     * @todo Once installment is available again, add it to the payment methods above and remove this array.
+     */
+    public static array $aFormerPaymentMethods = [
         'pcpsecureinstallment' => [
             'name' => 'PAYONE Secured Installment (Demo)',
             'checked' => 0,
