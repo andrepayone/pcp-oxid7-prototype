@@ -279,9 +279,14 @@ class PayoneApiService
         $apiKey = (string) $this->pcpGetShopConfVar('pcpApiKey');
         $apiSecret = (string) $this->pcpGetShopConfVar('pcpApiSecret');
 
+        if (empty($apiKey) || empty($apiSecret) || empty($this->merchantId)) {
+            Registry::getLogger()->error('[PCP] Missing API credentials for authentication-tokens.');
+            return '';
+        }
+
         $rfcDate = gmdate('D, d M Y H:i:s T');
         $path = '/v1/' . $this->merchantId . '/authentication-tokens';
-        $dataToSign = "POST\n\n\n" . $rfcDate . "\n" . $path;
+        $dataToSign = "POST\napplication/json\n" . $rfcDate . "\n" . $path;
         $signature = base64_encode(hash_hmac('sha256', $dataToSign, $apiSecret, true));
 
         $ch = curl_init($url);
@@ -300,6 +305,7 @@ class PayoneApiService
 
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
         curl_close($ch);
 
         if ($httpCode >= 200 && $httpCode < 300 && is_string($response)) {
@@ -309,9 +315,10 @@ class PayoneApiService
             }
         }
 
+        Registry::getLogger()->error('[PCP] getAuthenticationToken failed: HTTP ' . $httpCode . ' - ' . $response . ' - CurlError: ' . $curlError);
+
         return '';
     }
-
     public function getHostedTokenizationUrl(): string
     {
         $endpoint = (string) $this->pcpGetShopConfVar('pcpApiEndpoint');

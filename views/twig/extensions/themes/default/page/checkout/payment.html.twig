@@ -1,13 +1,13 @@
 {% extends 'page/checkout/payment.html.twig' %}
 
 {% block change_payment %}
-    {% if oView.isPcpPayment() %}
-        {{ script({ include: "js/widgets/oxpayment.min.js", priority: 10 }) }}
-        {{ script({ include: "js/libs/jqBootstrapValidation.min.js", priority: 10 }) }}
-        {{ script({ add: "$( '#payment' ).oxPayment();" }) }}
-        {{ script({ add: "$('input,select,textarea').not('[type=submit]').jqBootstrapValidation();" }) }}
+    <script src="{{ oView.pcpGetHostedTokenizationScriptUrl() }}" integrity="sha384-En0FTt1/y/oAtSiKcVajUNbL3xKFS6znYv+TGUO6wtMrD8d//NlUJRCVA7PT44Ua" crossorigin="anonymous"></script>
 
-        <script src="{{ oView.pcpGetHostedTokenizationScriptUrl() }}" integrity="sha384-En0FTt1/y/oAtSiKcVajUNbL3xKFS6znYv+TGUO6wtMrD8d//NlUJRCVA7PT44Ua" crossorigin="anonymous"></script>
+    {% if oView.isPcpPayment() %}
+        {{ script({ include: "js/widgets/oxpayment.min.js", priority: 10, dynamic: __oxid_include_dynamic }) }}
+        {{ script({ include: "js/libs/jqBootstrapValidation.min.js", priority: 10, dynamic: __oxid_include_dynamic }) }}
+        {{ script({ add: "$( '#payment' ).oxPayment();", dynamic: __oxid_include_dynamic }) }}
+        {{ script({ add: "$('input,select,textarea').not('[type=submit]').jqBootstrapValidation();", dynamic: __oxid_include_dynamic }) }}
 
         <form action="{{ oViewConf.getSslSelfLink() }}" class="form-horizontal js-oxValidate payment" id="payment" name="order" method="post" novalidate="novalidate">
             <div class="hidden">
@@ -182,22 +182,42 @@
                         <div class="alert alert-info">
                             <b>{{ translate({ ident: "MIN_ORDER_PRICE" }) }} {{ oView.getMinOrderPrice() }} {{ currency.sign }}</b>
                         </div>
+                    {% else %}
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ oViewConf.getBasketLink() }}" class="btn btn-outline-secondary" id="paymentBackStepBottom">
+                                <i class="bi bi-arrow-left"></i> {{ translate({ ident: "PREVIOUS_STEP" }) }}
+                            </a>
+                            <button type="submit" name="userform" class="btn btn-primary" id="paymentNextStepBottom">
+                                {{ translate({ ident: "CONTINUE_TO_NEXT_STEP" }) }} <i class="bi bi-arrow-right"></i>
+                            </button>
+                        </div>
                     {% endif %}
                 {% endblock %}
             {% endif %}
         </form>
 
         <script>
-            (function() {
+            document.addEventListener('DOMContentLoaded', function() {
                 var pcpJwt = '{{ oView.pcpGetJwtToken() }}';
+                var sdkInitialized = false;
+
+                if (!pcpJwt) {
+                    var errEl = document.getElementById('pcp_cc_error');
+                    if (errEl) {
+                        errEl.textContent = 'Token-Fehler: Authentication-Token konnte nicht geladen werden.';
+                        errEl.classList.remove('d-none');
+                    }
+                    return;
+                }
+
                 var pcpConfig = {
                     iframe: {
                         iframeWrapperId: "payment-IFrame",
-                        height: 400,
-                        width: 400,
+                        height: 350,
+                        width: "100%",
                         zIndex: 9998
                     },
-                    locale: "{{ oViewConf.getActLanguageAbbr() == 'de' ? 'de_DE' : 'en_GB' }}",
+                    locale: "{{ oView.pcpGetLocale() }}",
                     token: pcpJwt,
                     email: "",
                     showCardholderName: true,
@@ -206,9 +226,36 @@
                     allowedCardSchemes: ["amex", "mastercard", "visa", "diners"]
                 };
 
-                if (window.HostedTokenizationSdk && pcpJwt) {
-                    window.HostedTokenizationSdk.init().then(function() {
-                        window.HostedTokenizationSdk.getPaymentPage(pcpConfig);
+                function initPcpIframe() {
+                    if (sdkInitialized) return;
+                    var wrapper = document.getElementById('payment-IFrame');
+                    if (!wrapper || wrapper.offsetParent === null) return;
+
+                    if (window.HostedTokenizationSdk) {
+                        window.HostedTokenizationSdk.init().then(function() {
+                            window.HostedTokenizationSdk.getPaymentPage(pcpConfig);
+                            sdkInitialized = true;
+                        }).catch(function(err) {
+                            var errContainer = document.getElementById('pcp_cc_error');
+                            if (errContainer) {
+                                errContainer.textContent = 'SDK Init-Fehler';
+                                errContainer.classList.remove('d-none');
+                            }
+                        });
+                    }
+                }
+
+                var ccRadio = document.getElementById('payment_pcpcreditcard');
+                if (ccRadio) {
+                    if (ccRadio.checked) {
+                        initPcpIframe();
+                    }
+                    document.querySelectorAll('input[name="paymentid"]').forEach(function(radio) {
+                        radio.addEventListener('change', function() {
+                            if (ccRadio.checked) {
+                                setTimeout(initPcpIframe, 50);
+                            }
+                        });
                     });
                 }
 
@@ -218,32 +265,56 @@
                         var selectedPayment = document.querySelector('input[name="paymentid"]:checked');
                         var tokenInput = document.getElementById('pcp_creditcard_token');
 
-                        if (selectedPayment && selectedPayment.value === 'pcpcreditcard' && tokenInput && !tokenInput.value) {
+                        if (selectedPayment && selectedPayment.value === 'pcpcreditcard') {
+                            if (tokenInput && tokenInput.value !== '') {
+                                return true;
+                            }
+
                             event.preventDefault();
                             event.stopPropagation();
+
+                            var errorContainer = document.getElementById('pcp_cc_error');
+                            if (errorContainer) {
+                                errorContainer.classList.add('d-none');
+                            }
+
+                            if (!window.HostedTokenizationSdk || !sdkInitialized) {
+                                if (errorContainer) {
+                                    errorContainer.textContent = 'Kreditkartenformular nicht geladen.';
+                                    errorContainer.classList.remove('d-none');
+                                }
+                                return;
+                            }
 
                             window.HostedTokenizationSdk.submitForm(
                                 function(statusCode, token, cardDetails) {
                                     tokenInput.value = token;
-                                    if (cardDetails && cardDetails.cardType) {
-                                        document.getElementById('pcp_creditcard_cardtype').value = cardDetails.cardType;
-                                        var schemes = { visa: 1, amex: 2, mastercard: 3, diners: 132 };
-                                        document.getElementById('pcp_creditcard_product_id').value = schemes[cardDetails.cardType.toLowerCase()] || 1;
+                                    if (cardDetails) {
+                                        if (cardDetails.cardholderName) {
+                                            document.getElementById('pcp_creditcard_holder').value = cardDetails.cardholderName;
+                                        }
+                                        if (cardDetails.cardType) {
+                                            document.getElementById('pcp_creditcard_cardtype').value = cardDetails.cardType;
+                                            var schemes = { visa: 1, amex: 2, mastercard: 3, diners: 132 };
+                                            var mappedId = schemes[cardDetails.cardType.toLowerCase()] || 1;
+                                            document.getElementById('pcp_creditcard_product_id').value = mappedId;
+                                        }
                                     }
                                     paymentForm.submit();
                                 },
                                 function(statusCode, errorResponse) {
-                                    var errEl = document.getElementById('pcp_cc_error');
-                                    if (errEl) {
-                                        errEl.textContent = errorResponse && errorResponse.error ? errorResponse.error : 'Validation failed';
-                                        errEl.classList.remove('d-none');
+                                    if (errorContainer) {
+                                        errorContainer.textContent = errorResponse && errorResponse.error
+                                            ? errorResponse.error
+                                            : 'Validierungsfehler (' + statusCode + ')';
+                                        errorContainer.classList.remove('d-none');
                                     }
                                 }
                             );
                         }
                     });
                 }
-            })();
+            });
         </script>
     {% else %}
         {{ parent() }}
