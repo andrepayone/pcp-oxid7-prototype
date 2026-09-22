@@ -10,6 +10,7 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\Mod
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use Payone\PcpPrototype\Model\ApiLog;
 use PayoneCommercePlatform\Sdk\CommunicatorConfiguration;
+use PayoneCommercePlatform\Sdk\ApiClient\AuthenticationApiClient;
 use PayoneCommercePlatform\Sdk\ApiClient\CheckoutApiClient;
 use PayoneCommercePlatform\Sdk\ApiClient\CommerceCaseApiClient;
 use PayoneCommercePlatform\Sdk\ApiClient\OrderManagementCheckoutActionsApiClient;
@@ -61,6 +62,7 @@ use PayoneCommercePlatform\Sdk\Models\TransactionChannel;
 class PayoneApiService
 {
     protected CommunicatorConfiguration $config;
+    protected AuthenticationApiClient $authenticationClient;
     protected CommerceCaseApiClient $commerceCaseClient;
     protected CheckoutApiClient $checkoutClient;
     protected OrderManagementCheckoutActionsApiClient $orderManagementClient;
@@ -77,6 +79,7 @@ class PayoneApiService
             host: $this->pcpGetShopConfVar('pcpApiEndpoint'),
         );
 
+        $this->authenticationClient = new AuthenticationApiClient($this->config);
         $this->commerceCaseClient = new CommerceCaseApiClient($this->config);
         $this->checkoutClient = new CheckoutApiClient($this->config);
         $this->orderManagementClient = new OrderManagementCheckoutActionsApiClient($this->config);
@@ -117,7 +120,6 @@ class PayoneApiService
 
         $response = $this->commerceCaseClient->createCommerceCase($this->merchantId, $request);
 
-        // log complete entry
         $requestJson = json_encode(print_r($request, true));
         $responseJson = json_encode(print_r($response, true));
         $responseCode = '000';
@@ -149,7 +151,6 @@ class PayoneApiService
         $apiLog->pcpapilog__pcp_response_httpcode = new Field($responseCode);
         $apiLog->save();
     }
-
 
     /**
      * @throws ApiErrorResponseException
@@ -274,55 +275,13 @@ class PayoneApiService
 
     public function getAuthenticationToken(): string
     {
-        $endpoint = rtrim((string) $this->pcpGetShopConfVar('pcpApiEndpoint'), '/');
-        $relativeUri = '/v1/' . $this->merchantId . '/authentication-tokens';
-        $url = $endpoint . $relativeUri;
-
         try {
-            $authenticatorProperty = new \ReflectionProperty(\PayoneCommercePlatform\Sdk\ApiClient\CommerceCaseApiClient::class, 'communicator');
-            $authenticatorProperty->setAccessible(true);
-            $communicator = $authenticatorProperty->getValue($this->commerceCaseClient);
-
-            $authProperty = new \ReflectionProperty(get_class($communicator), 'authenticator');
-            $authProperty->setAccessible(true);
-            $authenticator = $authProperty->getValue($communicator);
-
-            $headers = $authenticator->createSimpleAuthenticationSignature('POST', $relativeUri);
-
-            $httpHeaders = [];
-            foreach ($headers as $name => $value) {
-                $httpHeaders[] = $name . ': ' . $value;
-            }
-            $httpHeaders[] = 'Accept: application/json';
-            $httpHeaders[] = 'Content-Length: 0';
-
-            $ch = curl_init($url);
-            curl_setopt_array($ch, [
-                CURLOPT_POST => true,
-                CURLOPT_POSTFIELDS => '',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_HTTPHEADER => $httpHeaders,
-                CURLOPT_TIMEOUT => 15,
-            ]);
-
-            $response = curl_exec($ch);
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            $curlError = curl_error($ch);
-            curl_close($ch);
-
-            if ($httpCode >= 200 && $httpCode < 300 && is_string($response)) {
-                $data = json_decode($response, true);
-                if (!empty($data['token'])) {
-                    return (string) $data['token'];
-                }
-            }
-
-            Registry::getLogger()->error('[PCP] getAuthenticationToken failed: HTTP ' . $httpCode . ' - ' . $response . ' - CurlError: ' . $curlError);
+            $tokenObject = $this->authenticationClient->getAuthenticationTokens($this->merchantId);
+            return (string) $tokenObject->getToken();
         } catch (\Throwable $e) {
-            Registry::getLogger()->error('[PCP] getAuthenticationToken exception: ' . $e->getMessage());
+            Registry::getLogger()->error('[PCP] Failed to retrieve authentication token: ' . $e->getMessage());
+            return '';
         }
-
-        return '';
     }
 
     public function getHostedTokenizationUrl(): string
@@ -354,11 +313,11 @@ class PayoneApiService
         $merchantReference = $dynValue['pcp_merchant_reference'];
 
         Registry::getLogger()->error('Completing installment payment with data: ' . print_r([
-            'commerceCaseId' => $commerceCaseId,
-            'checkoutId' => $checkoutId,
-            'paymentExecutionId' => $paymentExecutionId,
-            'installmentOptionId' => $installmentOptionId,
-        ], true));
+                'commerceCaseId' => $commerceCaseId,
+                'checkoutId' => $checkoutId,
+                'paymentExecutionId' => $paymentExecutionId,
+                'installmentOptionId' => $installmentOptionId,
+            ], true));
 
         try {
             $completePaymentRequest = new CompletePaymentRequest(
@@ -400,7 +359,6 @@ class PayoneApiService
                 'completePaymentRequest' => $completePaymentRequest,
             ];
 
-            // log complete entry
             $requestJson = json_encode(print_r($request, true));
             $responseJson = json_encode(print_r($response, true));
             $responseCode = '000';
@@ -604,7 +562,6 @@ class PayoneApiService
         );
     }
 
-
     protected function buildPaymentMethodSpecificInput($oUser, string $sPaymentId, array $dynValue = []): PaymentMethodSpecificInput
     {
         $sAccountHolder = $oUser->oxuser__oxfname->value . ' ' . $oUser->oxuser__oxlname->value;
@@ -664,6 +621,7 @@ class PayoneApiService
             paymentChannel: PaymentChannel::ECOMMERCE,
         );
     }
+
     protected function pcpGetReturnUrl(): string
     {
         $shopUrl = Registry::getConfig()->getCurrentShopUrl();
@@ -675,7 +633,7 @@ class PayoneApiService
         }
         $sToken = Registry::getRequest()->getRequestParameter('stoken');
 
-        return $shopUrl . 'index.php?cl=order&fnc=execute&pcpreturn=1&ord_agb=1&stoken=' . $sToken . $sessionId . $remoteAccessToken."&txid=__txid__";
+        return $shopUrl . 'index.php?cl=order&fnc=execute&pcpreturn=1&ord_agb=1&stoken=' . $sToken . $sessionId . $remoteAccessToken . '&txid=__txid__';
     }
 
     protected function buildAmountOfMoney(): AmountOfMoney
