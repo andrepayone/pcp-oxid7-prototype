@@ -68,4 +68,20 @@ class PaymentController extends PaymentController_parent
 
         return $this->pcpCheckoutReference;
     }
+
+    public function pcpGetJwtToken(): string
+    {
+        if ($this->pcpJwtToken === null) {
+            $oApiService = oxNew(PayoneApiService::class);
+            $this->pcpJwtToken = $oApiService->getAuthenticationToken();
+        }
+
+        return $this->pcpJwtToken;
+    }
+
+    public function pcpGetHostedTokenizationScriptUrl(): string
+    {
+        $oApiService = oxNew(PayoneApiService::class);
+        return $oApiService->getHostedTokenizationUrl();
+    }
 }

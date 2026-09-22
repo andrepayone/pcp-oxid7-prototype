@@ -108,7 +108,7 @@ class PayoneApiService
                     ? new OrderRequest(
                         orderReferences: new References(merchantReference: $this->generateReference('or')),
                         orderType: OrderType::FULL,
-                        paymentMethodSpecificInput: $this->buildPaymentMethodSpecificInput($user, $sPaymentId),
+                        paymentMethodSpecificInput: $this->buildPaymentMethodSpecificInput($user, $sPaymentId, $dynValue),
                     )
                     : null,
                 autoExecuteOrder: $blAutoExecute,
@@ -270,6 +270,66 @@ class PayoneApiService
                 cancellationReason: $cancellationReason,
             ),
         );
+    }
+
+    public function getAuthenticationToken(): string
+    {
+        $endpoint = rtrim((string) $this->pcpGetShopConfVar('pcpApiEndpoint'), '/');
+        $url = $endpoint . '/v1/' . $this->merchantId . '/authentication-tokens';
+        $apiKey = (string) $this->pcpGetShopConfVar('pcpApiKey');
+        $apiSecret = (string) $this->pcpGetShopConfVar('pcpApiSecret');
+
+        $rfcDate = gmdate('D, d M Y H:i:s T');
+        $path = '/v1/' . $this->merchantId . '/authentication-tokens';
+        $dataToSign = "POST\n\n\n" . $rfcDate . "\n" . $path;
+        $signature = base64_encode(hash_hmac('sha256', $dataToSign, $apiSecret, true));
+
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => '',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => [
+                'Date: ' . $rfcDate,
+                'Authorization: V1-HMAC-SHA256 ' . $apiKey . ':' . $signature,
+                'Content-Type: application/json',
+                'Accept: application/json',
+            ],
+            CURLOPT_TIMEOUT => 15,
+        ]);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($httpCode >= 200 && $httpCode < 300 && is_string($response)) {
+            $data = json_decode($response, true);
+            if (!empty($data['token'])) {
+                return (string) $data['token'];
+            }
+        }
+
+        return '';
+    }
+
+    public function getHostedTokenizationUrl(): string
+    {
+        $endpoint = (string) $this->pcpGetShopConfVar('pcpApiEndpoint');
+        $isPreprod = str_contains($endpoint, 'prelive') || str_contains($endpoint, 'test');
+
+        return $isPreprod
+            ? 'https://sdk.preprod.tokenization.secure.payone.com/1.7.0/hosted-tokenization-sdk.js'
+            : 'https://sdk.tokenization.secure.payone.com/1.7.0/hosted-tokenization-sdk.js';
+    }
+
+    protected function mapCardTypeToProductId(string $cardType): int
+    {
+        return match (strtolower(trim($cardType))) {
+            'american-express', 'american_express', 'amex' => 2,
+            'mastercard', 'master_card', 'mc' => 3,
+            'diners', 'diners-club', 'diners_club' => 132,
+            default => 1,
+        };
     }
 
     protected function completeInstallmentPayment($order, $user, $dynValue): CompletePaymentResponse | null
@@ -531,7 +591,8 @@ class PayoneApiService
         );
     }
 
-    protected function buildPaymentMethodSpecificInput($oUser, string $sPaymentId): PaymentMethodSpecificInput
+
+    protected function buildPaymentMethodSpecificInput($oUser, string $sPaymentId, array $dynValue = []): PaymentMethodSpecificInput
     {
         $sAccountHolder = $oUser->oxuser__oxfname->value . ' ' . $oUser->oxuser__oxlname->value;
 
@@ -553,12 +614,20 @@ class PayoneApiService
         }
 
         if ($sPaymentId === 'pcpcreditcard') {
+            $paymentToken = !empty($dynValue['pcp_creditcard_token'])
+                ? (string) $dynValue['pcp_creditcard_token']
+                : (string) $this->pcpGetShopConfVar('pcpDemoPaymentToken');
+
+            $productId = !empty($dynValue['pcp_creditcard_product_id'])
+                ? (int) $dynValue['pcp_creditcard_product_id']
+                : $this->mapCardTypeToProductId((string) ($dynValue['pcp_creditcard_cardtype'] ?? ''));
+
             return new PaymentMethodSpecificInput(
                 cardPaymentMethodSpecificInput: new CardPaymentMethodSpecificInput(
                     authorizationMode: AuthorizationMode::PRE_AUTHORIZATION,
-                    paymentProcessingToken: $this->pcpGetShopConfVar('pcpDemoPaymentToken'),
+                    paymentProcessingToken: $paymentToken,
                     transactionChannel: TransactionChannel::ECOMMERCE,
-                    paymentProductId: 1,
+                    paymentProductId: $productId,
                     returnUrl: $this->pcpGetReturnUrl(),
                 ),
                 paymentChannel: PaymentChannel::ECOMMERCE,
@@ -582,7 +651,6 @@ class PayoneApiService
             paymentChannel: PaymentChannel::ECOMMERCE,
         );
     }
-
     protected function pcpGetReturnUrl(): string
     {
         $shopUrl = Registry::getConfig()->getCurrentShopUrl();
