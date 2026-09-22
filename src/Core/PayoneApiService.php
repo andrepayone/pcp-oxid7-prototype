@@ -286,12 +286,7 @@ class PayoneApiService
 
     public function getHostedTokenizationUrl(): string
     {
-        $endpoint = (string) $this->pcpGetShopConfVar('pcpApiEndpoint');
-        $isPreprod = str_contains($endpoint, 'prelive') || str_contains($endpoint, 'test');
-
-        return $isPreprod
-            ? 'https://sdk.preprod.tokenization.secure.payone.com/1.7.0/hosted-tokenization-sdk.js'
-            : 'https://sdk.tokenization.secure.payone.com/1.7.0/hosted-tokenization-sdk.js';
+        return 'https://sdk.preprod.tokenization.secure.payone.com/1.7.0/hosted-tokenization-sdk.js';
     }
 
     protected function mapCardTypeToProductId(string $cardType): int
