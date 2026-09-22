@@ -21,6 +21,7 @@ use PayoneCommercePlatform\Sdk\Models\Address;
 use PayoneCommercePlatform\Sdk\Models\AddressPersonal;
 use PayoneCommercePlatform\Sdk\Models\AmountOfMoney;
 use PayoneCommercePlatform\Sdk\Models\AuthorizationMode;
+use PayoneCommercePlatform\Sdk\Models\CardInfo;
 use PayoneCommercePlatform\Sdk\Models\BankAccountInformation;
 use PayoneCommercePlatform\Sdk\Models\BusinessRelation;
 use PayoneCommercePlatform\Sdk\Models\CardPaymentMethodSpecificInput;
@@ -587,12 +588,19 @@ class PayoneApiService
                 ? (int) $dynValue['pcp_creditcard_product_id']
                 : $this->mapCardTypeToProductId((string) ($dynValue['pcp_creditcard_cardtype'] ?? ''));
 
+            $cardholderName = !empty($dynValue['pcp_creditcard_holder'])
+                ? (string) $dynValue['pcp_creditcard_holder']
+                : ($oUser->oxuser__oxfname->value . ' ' . $oUser->oxuser__oxlname->value);
+
             return new PaymentMethodSpecificInput(
                 cardPaymentMethodSpecificInput: new CardPaymentMethodSpecificInput(
                     authorizationMode: AuthorizationMode::PRE_AUTHORIZATION,
                     paymentProcessingToken: $paymentToken,
                     transactionChannel: TransactionChannel::ECOMMERCE,
                     paymentProductId: $productId,
+                    card: new CardInfo(
+                        cardholderName: $cardholderName,
+                    ),
                     returnUrl: $this->pcpGetReturnUrl(),
                 ),
                 paymentChannel: PaymentChannel::ECOMMERCE,
