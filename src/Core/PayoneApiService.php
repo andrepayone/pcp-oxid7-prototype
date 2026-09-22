@@ -274,63 +274,53 @@ class PayoneApiService
 
     public function getAuthenticationToken(): string
     {
-        try {
-            $communicator = $this->commerceCaseClient->getCommunicator();
-            $path = '/v1/' . $this->merchantId . '/authentication-tokens';
-            $response = $communicator->post($path, null, null);
-
-            if (is_object($response) && method_exists($response, 'getBody')) {
-                $body = json_decode((string) $response->getBody(), true);
-                return (string) ($body['token'] ?? '');
-            }
-            if (is_array($response)) {
-                return (string) ($response['token'] ?? '');
-            }
-        } catch (\Throwable $e) {
-            Registry::getLogger()->info('[PCP] Communicator request failed, using HTTP fallback: ' . $e->getMessage());
-        }
-
         $endpoint = rtrim((string) $this->pcpGetShopConfVar('pcpApiEndpoint'), '/');
-        $url = $endpoint . '/v1/' . $this->merchantId . '/authentication-tokens';
-        $apiKey = (string) $this->pcpGetShopConfVar('pcpApiKey');
-        $apiSecret = (string) $this->pcpGetShopConfVar('pcpApiSecret');
+        $relativeUri = '/v1/' . $this->merchantId . '/authentication-tokens';
+        $url = $endpoint . $relativeUri;
 
-        if (empty($apiKey) || empty($apiSecret) || empty($this->merchantId)) {
-            Registry::getLogger()->error('[PCP] Missing API credentials for authentication-tokens.');
-            return '';
-        }
+        try {
+            $authenticatorProperty = new \ReflectionProperty(\PayoneCommercePlatform\Sdk\ApiClient\CommerceCaseApiClient::class, 'communicator');
+            $authenticatorProperty->setAccessible(true);
+            $communicator = $authenticatorProperty->getValue($this->commerceCaseClient);
 
-        $rfcDate = gmdate('D, d M Y H:i:s T');
-        $resourcePath = '/v1/' . $this->merchantId . '/authentication-tokens';
-        $dataToSign = "POST\n\n" . $rfcDate . "\n" . $resourcePath . "\n";
-        $signature = base64_encode(hash_hmac('sha256', $dataToSign, $apiSecret, true));
+            $authProperty = new \ReflectionProperty(get_class($communicator), 'authenticator');
+            $authProperty->setAccessible(true);
+            $authenticator = $authProperty->getValue($communicator);
 
-        $ch = curl_init($url);
-        curl_setopt_array($ch, [
-            CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => '',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HTTPHEADER => [
-                'Date: ' . $rfcDate,
-                'Authorization: GCS v1HMAC:' . $apiKey . ':' . $signature,
-                'Accept: application/json',
-            ],
-            CURLOPT_TIMEOUT => 15,
-        ]);
+            $headers = $authenticator->createSimpleAuthenticationSignature('POST', $relativeUri);
 
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $curlError = curl_error($ch);
-        curl_close($ch);
-
-        if ($httpCode >= 200 && $httpCode < 300 && is_string($response)) {
-            $data = json_decode($response, true);
-            if (!empty($data['token'])) {
-                return (string) $data['token'];
+            $httpHeaders = [];
+            foreach ($headers as $name => $value) {
+                $httpHeaders[] = $name . ': ' . $value;
             }
-        }
+            $httpHeaders[] = 'Accept: application/json';
+            $httpHeaders[] = 'Content-Length: 0';
 
-        Registry::getLogger()->error('[PCP] getAuthenticationToken failed: HTTP ' . $httpCode . ' - ' . $response . ' - CurlError: ' . $curlError);
+            $ch = curl_init($url);
+            curl_setopt_array($ch, [
+                CURLOPT_POST => true,
+                CURLOPT_POSTFIELDS => '',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_HTTPHEADER => $httpHeaders,
+                CURLOPT_TIMEOUT => 15,
+            ]);
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($ch);
+            curl_close($ch);
+
+            if ($httpCode >= 200 && $httpCode < 300 && is_string($response)) {
+                $data = json_decode($response, true);
+                if (!empty($data['token'])) {
+                    return (string) $data['token'];
+                }
+            }
+
+            Registry::getLogger()->error('[PCP] getAuthenticationToken failed: HTTP ' . $httpCode . ' - ' . $response . ' - CurlError: ' . $curlError);
+        } catch (\Throwable $e) {
+            Registry::getLogger()->error('[PCP] getAuthenticationToken exception: ' . $e->getMessage());
+        }
 
         return '';
     }
