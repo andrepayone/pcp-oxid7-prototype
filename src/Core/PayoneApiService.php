@@ -286,7 +286,7 @@ class PayoneApiService
 
         $rfcDate = gmdate('D, d M Y H:i:s T');
         $path = '/v1/' . $this->merchantId . '/authentication-tokens';
-        $dataToSign = "POST\napplication/json\n" . $rfcDate . "\n" . $path;
+        $dataToSign = "POST\n\n\n" . $rfcDate . "\n" . $path;
         $signature = base64_encode(hash_hmac('sha256', $dataToSign, $apiSecret, true));
 
         $ch = curl_init($url);
@@ -297,7 +297,6 @@ class PayoneApiService
             CURLOPT_HTTPHEADER => [
                 'Date: ' . $rfcDate,
                 'Authorization: V1-HMAC-SHA256 ' . $apiKey . ':' . $signature,
-                'Content-Type: application/json',
                 'Accept: application/json',
             ],
             CURLOPT_TIMEOUT => 15,
@@ -315,10 +314,42 @@ class PayoneApiService
             }
         }
 
+        if ($httpCode === 403) {
+            $dataToSignWithContent = "POST\napplication/json\n" . $rfcDate . "\n" . $path;
+            $signatureWithContent = base64_encode(hash_hmac('sha256', $dataToSignWithContent, $apiSecret, true));
+
+            $ch = curl_init($url);
+            curl_setopt_array($ch, [
+                CURLOPT_POST => true,
+                CURLOPT_POSTFIELDS => '{}',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_HTTPHEADER => [
+                    'Date: ' . $rfcDate,
+                    'Authorization: V1-HMAC-SHA256 ' . $apiKey . ':' . $signatureWithContent,
+                    'Content-Type: application/json',
+                    'Accept: application/json',
+                ],
+                CURLOPT_TIMEOUT => 15,
+            ]);
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($ch);
+            curl_close($ch);
+
+            if ($httpCode >= 200 && $httpCode < 300 && is_string($response)) {
+                $data = json_decode($response, true);
+                if (!empty($data['token'])) {
+                    return (string) $data['token'];
+                }
+            }
+        }
+
         Registry::getLogger()->error('[PCP] getAuthenticationToken failed: HTTP ' . $httpCode . ' - ' . $response . ' - CurlError: ' . $curlError);
 
         return '';
     }
+
     public function getHostedTokenizationUrl(): string
     {
         $endpoint = (string) $this->pcpGetShopConfVar('pcpApiEndpoint');
