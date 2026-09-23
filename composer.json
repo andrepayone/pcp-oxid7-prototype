@@ -25,7 +25,8 @@
   ],
   "require": {
     "php": ">=8.2",
-    "payone-gmbh/pcp-serversdk-php": "dev-release/1.9.0"
+    "payone-gmbh/pcp-serversdk-php": "dev-release/1.9.0",
+    "ext-curl": "*"
   },
   "autoload": {
     "psr-4": {
