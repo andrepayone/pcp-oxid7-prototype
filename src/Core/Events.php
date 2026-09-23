@@ -224,9 +224,12 @@ class Events
 
     public static function activatePcpPayments(): void
     {
-        $aActivePayments = array_filter(self::$aPaymentMethods, function ($aPayment) {
-            return $aPayment['active'] === 1;
-        });
+        $aActivePayments = [];
+        foreach (self::$aPaymentMethods as $sPaymentOxid => $aPayment) {
+            if ($aPayment['active'] === 1) {
+                $aActivePayments[$sPaymentOxid] = $aPayment;
+            }
+        }
         $sPaymentIds = "'" . implode("','", array_keys($aActivePayments)) . "'";
         DatabaseProvider::getDb()->execute(
             "UPDATE oxpayments SET oxactive = 1 WHERE oxid IN ({$sPaymentIds})"
