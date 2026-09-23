@@ -172,7 +172,7 @@ class Events
                     OXDESC_3, OXVALDESC_3, OXLONGDESC, OXLONGDESC_1,
                     OXLONGDESC_2, OXLONGDESC_3, OXSORT
                 ) VALUES (
-                    '{$sPaymentOxid}', 1, '{$sPaymentName}', 0, 'abs',
+                    '{$sPaymentOxid}', 0, '{$sPaymentName}', 0, 'abs',
                     0, 1000000, '', {$iChecked},
                     '{$sPaymentName}', '', '', '',
                     '', '', '', '',
