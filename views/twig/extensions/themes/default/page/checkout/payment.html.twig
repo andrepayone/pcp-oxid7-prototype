@@ -63,13 +63,6 @@
                                                        for="payment_{{ sPaymentID }}">{{ paymentmethod.oxpayments__oxdesc.value }}</label>
                                                 <div class="payment-option-info{% if oView.getCheckedPaymentId() == paymentmethod.oxpayments__oxid.value %} activePayment{% endif %}">
                                                     <div class="pcp-payment-content">
-                                                        <div>
-                                                            <img
-                                                                    src="{{ oViewConf.getModuleUrl('PayonePcpPrototype', 'img/visa_logo.png') }}"
-                                                                    alt="{{ translate({ ident: "PCP_DEMO_CREDITCARD" }) }}"
-                                                                    style="max-width: 200px;margin-bottom: 20px;"
-                                                            >
-                                                        </div>
                                                         <div id="payment-IFrame"></div>
                                                         <div id="pcp_cc_error" class="alert alert-danger d-none mt-2"></div>
                                                     </div>
