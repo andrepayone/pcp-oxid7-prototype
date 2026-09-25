@@ -13,10 +13,10 @@ $aModule = [
         'en' => 'Demo-Plugin for the PCP omnichannel platform "PAYONE COMMERCE PLATFORM".',
     ],
     'thumbnail' => 'picture.gif',
-    'version' => '1.0.0',
+    'version' => '1.1.0',
     'author' => 'PAYONE GmbH',
     'email' => 'integrations@payone.com',
-    'url' => 'https://docs.payone.com/pcp/payone-commerce-platform',
+    'url' => 'https://docs.commerce.payone.com/',
     'extend' => [
         \OxidEsales\Eshop\Core\ViewConfig::class => \Payone\PcpPrototype\Core\ViewConfig::class,
         \OxidEsales\Eshop\Application\Controller\Admin\ModuleConfiguration::class => \Payone\PcpPrototype\Controller\Admin\ModuleConfigController::class,

@@ -26,23 +26,39 @@ class Events
         'pcppayinstore' => [
             'name' => 'PAYONE Reserve Online - Pay in Store (Demo)',
             'checked' => 1,
+            'active' => 1,
             'sorting' => 1,
         ],
         'pcpcreditcard' => [
             'name' => 'PAYONE Credit Card Payment (Demo)',
+            'active' => 1,
             'checked' => 0,
             'sorting' => 2,
         ],
         'pcppaypal' => [
             'name' => 'PAYONE PayPal Payment (Demo)',
             'checked' => 0,
+            'active' => 1,
             'sorting' => 3,
         ],
         'pcpsecuredebit' => [
             'name' => 'PAYONE Secured Direct Debit (Demo)',
             'checked' => 0,
+            'active' => 0,
             'sorting' => 4,
         ],
+        'pcpsecureinstallment' => [
+            'name' => 'PAYONE Secured Installment (Demo)',
+            'checked' => 0,
+            'active' => 0,
+            'sorting' => 5,
+        ],
+    ];
+
+    /**
+     * @todo Once installment is available again, add it to the payment methods above and remove this array.
+     */
+    public static array $aFormerPaymentMethods = [
         'pcpsecureinstallment' => [
             'name' => 'PAYONE Secured Installment (Demo)',
             'checked' => 0,
@@ -156,7 +172,7 @@ class Events
                     OXDESC_3, OXVALDESC_3, OXLONGDESC, OXLONGDESC_1,
                     OXLONGDESC_2, OXLONGDESC_3, OXSORT
                 ) VALUES (
-                    '{$sPaymentOxid}', 1, '{$sPaymentName}', 0, 'abs',
+                    '{$sPaymentOxid}', 0, '{$sPaymentName}', 0, 'abs',
                     0, 1000000, '', {$iChecked},
                     '{$sPaymentName}', '', '', '',
                     '', '', '', '',
@@ -208,7 +224,13 @@ class Events
 
     public static function activatePcpPayments(): void
     {
-        $sPaymentIds = "'" . implode("','", array_keys(self::$aPaymentMethods)) . "'";
+        $aActivePayments = [];
+        foreach (self::$aPaymentMethods as $sPaymentOxid => $aPayment) {
+            if ($aPayment['active'] === 1) {
+                $aActivePayments[$sPaymentOxid] = $aPayment;
+            }
+        }
+        $sPaymentIds = "'" . implode("','", array_keys($aActivePayments)) . "'";
         DatabaseProvider::getDb()->execute(
             "UPDATE oxpayments SET oxactive = 1 WHERE oxid IN ({$sPaymentIds})"
         );

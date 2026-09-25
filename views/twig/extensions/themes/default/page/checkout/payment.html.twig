@@ -1,11 +1,13 @@
 {% extends 'page/checkout/payment.html.twig' %}
 
 {% block change_payment %}
+    <script src="{{ oView.pcpGetHostedTokenizationScriptUrl() }}" integrity="sha384-En0FTt1/y/oAtSiKcVajUNbL3xKFS6znYv+TGUO6wtMrD8d//NlUJRCVA7PT44Ua" crossorigin="anonymous"></script>
+
     {% if oView.isPcpPayment() %}
-        {{ script({ include: "js/widgets/oxpayment.min.js", priority: 10 }) }}
-        {{ script({ include: "js/libs/jqBootstrapValidation.min.js", priority: 10 }) }}
-        {{ script({ add: "$( '#payment' ).oxPayment();" }) }}
-        {{ script({ add: "$('input,select,textarea').not('[type=submit]').jqBootstrapValidation();" }) }}
+        {{ script({ include: "js/widgets/oxpayment.min.js", priority: 10, dynamic: __oxid_include_dynamic }) }}
+        {{ script({ include: "js/libs/jqBootstrapValidation.min.js", priority: 10, dynamic: __oxid_include_dynamic }) }}
+        {{ script({ add: "$( '#payment' ).oxPayment();", dynamic: __oxid_include_dynamic }) }}
+        {{ script({ add: "$('input,select,textarea').not('[type=submit]').jqBootstrapValidation();", dynamic: __oxid_include_dynamic }) }}
 
         <form action="{{ oViewConf.getSslSelfLink() }}" class="form-horizontal js-oxValidate payment" id="payment" name="order" method="post" novalidate="novalidate">
             <div class="hidden">
@@ -13,6 +15,10 @@
                 {{ oViewConf.getNavFormParams()|raw }}
                 <input type="hidden" name="cl" value="{{ oViewConf.getActiveClassName() }}">
                 <input type="hidden" name="fnc" value="validatepayment">
+                <input type="hidden" id="pcp_creditcard_token" name="dynvalue[pcp_creditcard_token]" value="">
+                <input type="hidden" id="pcp_creditcard_cardtype" name="dynvalue[pcp_creditcard_cardtype]" value="">
+                <input type="hidden" id="pcp_creditcard_product_id" name="dynvalue[pcp_creditcard_product_id]" value="">
+                <input type="hidden" id="pcp_creditcard_holder" name="dynvalue[pcp_creditcard_holder]" value="">
             </div>
 
             <div class="card mb-3">
@@ -57,51 +63,8 @@
                                                        for="payment_{{ sPaymentID }}">{{ paymentmethod.oxpayments__oxdesc.value }}</label>
                                                 <div class="payment-option-info{% if oView.getCheckedPaymentId() == paymentmethod.oxpayments__oxid.value %} activePayment{% endif %}">
                                                     <div class="pcp-payment-content">
-                                                        <div>
-                                                            <img
-                                                                src="{{ oViewConf.getModuleUrl('PayonePcpPrototype', 'img/visa_logo.png') }}"
-                                                                alt="{{ translate({ ident: "PCP_DEMO_CREDITCARD" }) }}"
-                                                                style="max-width: 200px;margin-bottom: 20px;"
-                                                            >
-                                                        </div>
-                                                        <div class="form-floating mb-3">
-                                                            <select id="{{ sPaymentID }}_cctype" name="dynvalue[pcp_demo_cctype]" class="form-select" disabled>
-                                                                <option value="pcp_demo_visa" selected>Visa</option>
-                                                                <option value="pcp_demo_mastercard">Mastercard</option>
-                                                            </select>
-                                                            <label for="{{ sPaymentID }}_cctype">{{ translate({ ident: "PCP_DEMO_CREDITCARD" }) }}</label>
-                                                        </div>
-                                                        <div class="form-floating mb-3">
-                                                            <input id="{{ sPaymentID }}_ccnumber" placeholder="{{ translate({ ident: 'PCP_DEMO_CC_NUMBER' }) }}" autocomplete="off" type="text" class="form-control" size="20" maxlength="64" name="dynvalue[pcp_demo_ccnumber]" value="4716971940353559" disabled>
-                                                            <label for="{{ sPaymentID }}_ccnumber">{{ translate({ ident: "PCP_DEMO_CC_NUMBER" }) }}</label>
-                                                        </div>
-                                                        <div class="form-floating mb-3">
-                                                            <input id="{{ sPaymentID }}_cccardholder" placeholder="{{ translate({ ident: 'PCP_CC_CARDHOLDER' }) }}" autocomplete="off" type="text" class="form-control" size="20" maxlength="64" name="dynvalue[pcp_demo_ccholder]" value="{{ oView.pcpGetCardHolder() }}" disabled>
-                                                            <label for="{{ sPaymentID }}_cccardholder">{{ translate({ ident: "PCP_CC_CARDHOLDER" }) }}</label>
-                                                        </div>
-                                                        <div class="form-floating mb-3">
-                                                            <input id="{{ sPaymentID }}_cccheck" placeholder="{{ translate({ ident: 'PCP_DEMO_CARD_SECURITY_CODE' }) }}" autocomplete="off" type="text" class="form-control" size="20" maxlength="64" name="dynvalue[pcp_demo_cccheck]" value="123" disabled>
-                                                            <label for="{{ sPaymentID }}_cccheck">{{ translate({ ident: "PCP_DEMO_CARD_SECURITY_CODE" }) }}:</label>
-                                                        </div>
-                                                        <div class="form-floating mb-3">
-                                                            {{ translate({ ident: "PCP_VALID_UNTIL" }) }}:
-                                                        </div>
-                                                        <div class="form-floating mb-3">
-                                                            <select id="{{ sPaymentID }}_ccmonth" name="dynvalue[pcp_demo_ccmonth]" class="form-select" disabled>
-                                                                {% for m in ['01','02','03','04','05','06','07','08','09','10','11','12'] %}
-                                                                    <option {{ m == '07' ? 'selected' : '' }}>{{ m }}</option>
-                                                                {% endfor %}
-                                                            </select>
-                                                            <label for="{{ sPaymentID }}_ccmonth">{{ translate({ ident: "PCP_VALID_UNTIL_MONTH" }) }}</label>
-                                                        </div>
-                                                        <div class="form-floating mb-3">
-                                                            <select id="{{ sPaymentID }}_ccyear" name="dynvalue[pcp_demo_ccyear]" class="form-select" disabled>
-                                                                {% for y in ['2024','2025','2026','2027','2028'] %}
-                                                                    <option {{ y == '2027' ? 'selected' : '' }}>{{ y }}</option>
-                                                                {% endfor %}
-                                                            </select>
-                                                            <label for="{{ sPaymentID }}_ccyear">{{ translate({ ident: "PCP_VALID_UNTIL_YEAR" }) }}</label>
-                                                        </div>
+                                                        <div id="payment-IFrame"></div>
+                                                        <div id="pcp_cc_error" class="alert alert-danger d-none mt-2"></div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -145,9 +108,9 @@
                                                 <div class="payment-option-info{% if oView.getCheckedPaymentId() == paymentmethod.oxpayments__oxid.value %} activePayment{% endif %}">
                                                     <div class="pcp-payment-content">
                                                         <img
-                                                            src="{{ oViewConf.getModuleUrl('PayonePcpPrototype', 'img/paypal.png') }}"
-                                                            alt="PayPal"
-                                                            style="max-width: 200px;margin-bottom: 20px;"
+                                                                src="{{ oViewConf.getModuleUrl('PayonePcpPrototype', 'img/paypal.png') }}"
+                                                                alt="PayPal"
+                                                                style="max-width: 200px;margin-bottom: 20px;"
                                                         >
                                                     </div>
                                                 </div>
@@ -187,8 +150,8 @@
                                                     <div class="pcp-payment-content">
                                                         <div>
                                                             <img
-                                                                src="{{ oViewConf.getModuleUrl('PayonePcpPrototype', 'img/pick_up_in_store.png') }}"
-                                                                alt="{{ translate({ ident: "PCP_MESSAGE_PAY_IN_STORE_PAYMENT" }) }}"
+                                                                    src="{{ oViewConf.getModuleUrl('PayonePcpPrototype', 'img/pick_up_in_store.png') }}"
+                                                                    alt="{{ translate({ ident: "PCP_MESSAGE_PAY_IN_STORE_PAYMENT" }) }}"
                                                             >
                                                         </div>
                                                         <div class="desc">
@@ -212,10 +175,140 @@
                         <div class="alert alert-info">
                             <b>{{ translate({ ident: "MIN_ORDER_PRICE" }) }} {{ oView.getMinOrderPrice() }} {{ currency.sign }}</b>
                         </div>
+                    {% else %}
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ oViewConf.getBasketLink() }}" class="btn btn-outline-secondary" id="paymentBackStepBottom">
+                                <i class="bi bi-arrow-left"></i> {{ translate({ ident: "PREVIOUS_STEP" }) }}
+                            </a>
+                            <button type="submit" name="userform" class="btn btn-primary" id="paymentNextStepBottom">
+                                {{ translate({ ident: "CONTINUE_TO_NEXT_STEP" }) }} <i class="bi bi-arrow-right"></i>
+                            </button>
+                        </div>
                     {% endif %}
                 {% endblock %}
             {% endif %}
         </form>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var pcpJwt = '{{ oView.pcpGetJwtToken() }}';
+                var sdkInitialized = false;
+
+                if (!pcpJwt) {
+                    var errEl = document.getElementById('pcp_cc_error');
+                    if (errEl) {
+                        errEl.textContent = 'Token-Fehler: Authentication-Token konnte nicht geladen werden.';
+                        errEl.classList.remove('d-none');
+                    }
+                    return;
+                }
+
+                var pcpConfig = {
+                    iframe: {
+                        iframeWrapperId: "payment-IFrame",
+                        height: 350,
+                        width: "100%",
+                        zIndex: 9998
+                    },
+                    locale: "{{ oViewConf.getActLanguageAbbr() == 'de' ? 'de_DE' : 'en_GB' }}",
+                    token: pcpJwt,
+                    email: "",
+                    showCardholderName: true,
+                    strictCardholderName: false,
+                    isSecurityCodeMasked: true,
+                    allowedCardSchemes: ["amex", "mastercard", "visa", "diners"]
+                };
+
+                function initPcpIframe() {
+                    if (sdkInitialized) return;
+                    var wrapper = document.getElementById('payment-IFrame');
+                    if (!wrapper || wrapper.offsetParent === null) return;
+
+                    if (window.HostedTokenizationSdk) {
+                        window.HostedTokenizationSdk.init().then(function() {
+                            window.HostedTokenizationSdk.getPaymentPage(pcpConfig);
+                            sdkInitialized = true;
+                        }).catch(function(err) {
+                            var errContainer = document.getElementById('pcp_cc_error');
+                            if (errContainer) {
+                                errContainer.textContent = 'SDK Init-Fehler';
+                                errContainer.classList.remove('d-none');
+                            }
+                        });
+                    }
+                }
+
+                var ccRadio = document.getElementById('payment_pcpcreditcard');
+                if (ccRadio) {
+                    if (ccRadio.checked) {
+                        initPcpIframe();
+                    }
+                    document.querySelectorAll('input[name="paymentid"]').forEach(function(radio) {
+                        radio.addEventListener('change', function() {
+                            if (ccRadio.checked) {
+                                setTimeout(initPcpIframe, 50);
+                            }
+                        });
+                    });
+                }
+
+                var paymentForm = document.getElementById('payment');
+                if (paymentForm) {
+                    paymentForm.addEventListener('submit', function(event) {
+                        var selectedPayment = document.querySelector('input[name="paymentid"]:checked');
+                        var tokenInput = document.getElementById('pcp_creditcard_token');
+
+                        if (selectedPayment && selectedPayment.value === 'pcpcreditcard') {
+                            if (tokenInput && tokenInput.value !== '') {
+                                return true;
+                            }
+
+                            event.preventDefault();
+                            event.stopPropagation();
+
+                            var errorContainer = document.getElementById('pcp_cc_error');
+                            if (errorContainer) {
+                                errorContainer.classList.add('d-none');
+                            }
+
+                            if (!window.HostedTokenizationSdk || !sdkInitialized) {
+                                if (errorContainer) {
+                                    errorContainer.textContent = 'Kreditkartenformular nicht geladen.';
+                                    errorContainer.classList.remove('d-none');
+                                }
+                                return;
+                            }
+
+                            window.HostedTokenizationSdk.submitForm(
+                                function(statusCode, token, cardDetails) {
+                                    tokenInput.value = token;
+                                    if (cardDetails) {
+                                        if (cardDetails.cardholderName) {
+                                            document.getElementById('pcp_creditcard_holder').value = cardDetails.cardholderName;
+                                        }
+                                        if (cardDetails.cardType) {
+                                            document.getElementById('pcp_creditcard_cardtype').value = cardDetails.cardType;
+                                            var schemes = { visa: 1, amex: 2, mastercard: 3, diners: 132 };
+                                            var mappedId = schemes[cardDetails.cardType.toLowerCase()] || 1;
+                                            document.getElementById('pcp_creditcard_product_id').value = mappedId;
+                                        }
+                                    }
+                                    paymentForm.submit();
+                                },
+                                function(statusCode, errorResponse) {
+                                    if (errorContainer) {
+                                        errorContainer.textContent = errorResponse && errorResponse.error
+                                            ? errorResponse.error
+                                            : 'Validierungsfehler (' + statusCode + ')';
+                                        errorContainer.classList.remove('d-none');
+                                    }
+                                }
+                            );
+                        }
+                    });
+                }
+            });
+        </script>
     {% else %}
         {{ parent() }}
     {% endif %}
