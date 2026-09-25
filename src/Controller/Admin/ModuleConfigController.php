@@ -88,6 +88,7 @@ class ModuleConfigController extends ModuleConfigController_parent
             'pic1' => 'hopper_1.jpg',
             'pic2' => '',
             'pic3' => '',
+            'stock' => 100,
         ],
         '2' => [
             'title' => 'PAYONE T-Shirt',
@@ -97,6 +98,7 @@ class ModuleConfigController extends ModuleConfigController_parent
             'pic1' => 'payone_shirt_1.png',
             'pic2' => '',
             'pic3' => '',
+            'stock' => 100,
         ],
         '3' => [
             'title' => 'PAYONE Rucksack',
@@ -106,6 +108,7 @@ class ModuleConfigController extends ModuleConfigController_parent
             'pic1' => 'payone_backpack_1.png',
             'pic2' => '',
             'pic3' => '',
+            'stock' => 100,
         ],
         '4' => [
             'title' => 'PAYONE SHOPPER BAG',
@@ -115,6 +118,7 @@ class ModuleConfigController extends ModuleConfigController_parent
             'pic1' => 'Shopper_1.jpg',
             'pic2' => 'Shopper_2.jpg',
             'pic3' => 'Shopper_3.jpg',
+            'stock' => 100,
         ],
         '5' => [
             'title' => 'PAYONE Patsy',
@@ -124,6 +128,7 @@ class ModuleConfigController extends ModuleConfigController_parent
             'pic1' => 'Patsy_1.png',
             'pic2' => 'Patsy_2.png',
             'pic3' => 'Patsy_3.png',
+            'stock' => 100,
         ],
     ];
 
@@ -461,6 +466,7 @@ class ModuleConfigController extends ModuleConfigController_parent
             $oArticle->oxarticles__oxartnum = new Field($aDemoProduct['artnum']);
             $oArticle->oxarticles__oxtitle = new Field($aDemoProduct['title']);
             $oArticle->oxarticles__oxprice = new Field($aDemoProduct['price']);
+            $oArticle->oxarticles__oxstock = new Field($aDemoProduct['stock']);
             $oArticle->setArticleLongDesc($aDemoProduct['longdesc']);
 
             if (!empty($aDemoProduct['pic1'])) {

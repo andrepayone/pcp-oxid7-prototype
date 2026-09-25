@@ -10,6 +10,7 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\Mod
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use Payone\PcpPrototype\Model\ApiLog;
 use PayoneCommercePlatform\Sdk\CommunicatorConfiguration;
+use PayoneCommercePlatform\Sdk\ApiClient\AuthenticationApiClient;
 use PayoneCommercePlatform\Sdk\ApiClient\CheckoutApiClient;
 use PayoneCommercePlatform\Sdk\ApiClient\CommerceCaseApiClient;
 use PayoneCommercePlatform\Sdk\ApiClient\OrderManagementCheckoutActionsApiClient;
@@ -20,6 +21,7 @@ use PayoneCommercePlatform\Sdk\Models\Address;
 use PayoneCommercePlatform\Sdk\Models\AddressPersonal;
 use PayoneCommercePlatform\Sdk\Models\AmountOfMoney;
 use PayoneCommercePlatform\Sdk\Models\AuthorizationMode;
+use PayoneCommercePlatform\Sdk\Models\CardInfo;
 use PayoneCommercePlatform\Sdk\Models\BankAccountInformation;
 use PayoneCommercePlatform\Sdk\Models\BusinessRelation;
 use PayoneCommercePlatform\Sdk\Models\CardPaymentMethodSpecificInput;
@@ -61,6 +63,7 @@ use PayoneCommercePlatform\Sdk\Models\TransactionChannel;
 class PayoneApiService
 {
     protected CommunicatorConfiguration $config;
+    protected AuthenticationApiClient $authenticationClient;
     protected CommerceCaseApiClient $commerceCaseClient;
     protected CheckoutApiClient $checkoutClient;
     protected OrderManagementCheckoutActionsApiClient $orderManagementClient;
@@ -77,6 +80,7 @@ class PayoneApiService
             host: $this->pcpGetShopConfVar('pcpApiEndpoint'),
         );
 
+        $this->authenticationClient = new AuthenticationApiClient($this->config);
         $this->commerceCaseClient = new CommerceCaseApiClient($this->config);
         $this->checkoutClient = new CheckoutApiClient($this->config);
         $this->orderManagementClient = new OrderManagementCheckoutActionsApiClient($this->config);
@@ -108,7 +112,7 @@ class PayoneApiService
                     ? new OrderRequest(
                         orderReferences: new References(merchantReference: $this->generateReference('or')),
                         orderType: OrderType::FULL,
-                        paymentMethodSpecificInput: $this->buildPaymentMethodSpecificInput($user, $sPaymentId),
+                        paymentMethodSpecificInput: $this->buildPaymentMethodSpecificInput($user, $sPaymentId, $dynValue),
                     )
                     : null,
                 autoExecuteOrder: $blAutoExecute,
@@ -117,7 +121,6 @@ class PayoneApiService
 
         $response = $this->commerceCaseClient->createCommerceCase($this->merchantId, $request);
 
-        // log complete entry
         $requestJson = json_encode(print_r($request, true));
         $responseJson = json_encode(print_r($response, true));
         $responseCode = '000';
@@ -149,7 +152,6 @@ class PayoneApiService
         $apiLog->pcpapilog__pcp_response_httpcode = new Field($responseCode);
         $apiLog->save();
     }
-
 
     /**
      * @throws ApiErrorResponseException
@@ -272,6 +274,32 @@ class PayoneApiService
         );
     }
 
+    public function getAuthenticationToken(): string
+    {
+        try {
+            $tokenObject = $this->authenticationClient->getAuthenticationTokens($this->merchantId);
+            return (string) $tokenObject->getToken();
+        } catch (\Throwable $e) {
+            Registry::getLogger()->error('[PCP] Failed to retrieve authentication token: ' . $e->getMessage());
+            return '';
+        }
+    }
+
+    public function getHostedTokenizationUrl(): string
+    {
+        return 'https://sdk.preprod.tokenization.secure.payone.com/1.7.0/hosted-tokenization-sdk.js';
+    }
+
+    protected function mapCardTypeToProductId(string $cardType): int
+    {
+        return match (strtolower(trim($cardType))) {
+            'american-express', 'american_express', 'amex' => 2,
+            'mastercard', 'master_card', 'mc' => 3,
+            'diners', 'diners-club', 'diners_club' => 132,
+            default => 1,
+        };
+    }
+
     protected function completeInstallmentPayment($order, $user, $dynValue): CompletePaymentResponse | null
     {
         $commerceCaseId = Registry::getSession()->getVariable('bnplInstallmentCommerceCaseId');
@@ -281,11 +309,11 @@ class PayoneApiService
         $merchantReference = $dynValue['pcp_merchant_reference'];
 
         Registry::getLogger()->error('Completing installment payment with data: ' . print_r([
-            'commerceCaseId' => $commerceCaseId,
-            'checkoutId' => $checkoutId,
-            'paymentExecutionId' => $paymentExecutionId,
-            'installmentOptionId' => $installmentOptionId,
-        ], true));
+                'commerceCaseId' => $commerceCaseId,
+                'checkoutId' => $checkoutId,
+                'paymentExecutionId' => $paymentExecutionId,
+                'installmentOptionId' => $installmentOptionId,
+            ], true));
 
         try {
             $completePaymentRequest = new CompletePaymentRequest(
@@ -327,7 +355,6 @@ class PayoneApiService
                 'completePaymentRequest' => $completePaymentRequest,
             ];
 
-            // log complete entry
             $requestJson = json_encode(print_r($request, true));
             $responseJson = json_encode(print_r($response, true));
             $responseCode = '000';
@@ -531,7 +558,7 @@ class PayoneApiService
         );
     }
 
-    protected function buildPaymentMethodSpecificInput($oUser, string $sPaymentId): PaymentMethodSpecificInput
+    protected function buildPaymentMethodSpecificInput($oUser, string $sPaymentId, array $dynValue = []): PaymentMethodSpecificInput
     {
         $sAccountHolder = $oUser->oxuser__oxfname->value . ' ' . $oUser->oxuser__oxlname->value;
 
@@ -553,12 +580,27 @@ class PayoneApiService
         }
 
         if ($sPaymentId === 'pcpcreditcard') {
+            $paymentToken = !empty($dynValue['pcp_creditcard_token'])
+                ? (string) $dynValue['pcp_creditcard_token']
+                : (string) $this->pcpGetShopConfVar('pcpDemoPaymentToken');
+
+            $productId = !empty($dynValue['pcp_creditcard_product_id'])
+                ? (int) $dynValue['pcp_creditcard_product_id']
+                : $this->mapCardTypeToProductId((string) ($dynValue['pcp_creditcard_cardtype'] ?? ''));
+
+            $cardholderName = !empty($dynValue['pcp_creditcard_holder'])
+                ? (string) $dynValue['pcp_creditcard_holder']
+                : ($oUser->oxuser__oxfname->value . ' ' . $oUser->oxuser__oxlname->value);
+
             return new PaymentMethodSpecificInput(
                 cardPaymentMethodSpecificInput: new CardPaymentMethodSpecificInput(
                     authorizationMode: AuthorizationMode::PRE_AUTHORIZATION,
-                    paymentProcessingToken: $this->pcpGetShopConfVar('pcpDemoPaymentToken'),
+                    paymentProcessingToken: $paymentToken,
                     transactionChannel: TransactionChannel::ECOMMERCE,
-                    paymentProductId: 1,
+                    paymentProductId: $productId,
+                    card: new CardInfo(
+                        cardholderName: $cardholderName,
+                    ),
                     returnUrl: $this->pcpGetReturnUrl(),
                 ),
                 paymentChannel: PaymentChannel::ECOMMERCE,
@@ -594,7 +636,7 @@ class PayoneApiService
         }
         $sToken = Registry::getRequest()->getRequestParameter('stoken');
 
-        return $shopUrl . 'index.php?cl=order&fnc=execute&pcpreturn=1&ord_agb=1&stoken=' . $sToken . $sessionId . $remoteAccessToken."&txid=__txid__";
+        return $shopUrl . 'index.php?cl=order&fnc=execute&pcpreturn=1&ord_agb=1&stoken=' . $sToken . $sessionId . $remoteAccessToken . '&txid=__txid__';
     }
 
     protected function buildAmountOfMoney(): AmountOfMoney
