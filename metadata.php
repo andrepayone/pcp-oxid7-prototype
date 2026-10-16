@@ -13,7 +13,7 @@ $aModule = [
         'en' => 'Demo-Plugin for the PCP omnichannel platform "PAYONE COMMERCE PLATFORM".',
     ],
     'thumbnail' => 'picture.gif',
-    'version' => '1.1.0',
+    'version' => '26.10-2-NostalgicNew',
     'author' => 'PAYONE GmbH',
     'email' => 'integrations@payone.com',
     'url' => 'https://docs.commerce.payone.com/',
