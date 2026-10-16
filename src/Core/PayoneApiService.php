@@ -59,6 +59,11 @@ use PayoneCommercePlatform\Sdk\Models\References;
 use PayoneCommercePlatform\Sdk\Models\Shipping;
 use PayoneCommercePlatform\Sdk\Models\ShoppingCartInput;
 use PayoneCommercePlatform\Sdk\Models\TransactionChannel;
+use DateTimeInterface;
+use JsonSerializable;
+use ReflectionObject;
+use UnitEnum;
+use BackedEnum;
 
 class PayoneApiService
 {
@@ -121,12 +126,19 @@ class PayoneApiService
 
         $response = $this->commerceCaseClient->createCommerceCase($this->merchantId, $request);
 
-        $requestJson = json_encode(print_r($request, true));
-        $responseJson = json_encode(print_r($response, true));
+        $requestJson = $this->sdkObjectToJson($request);
+        $responseJson = $this->sdkObjectToJson($response);
         $responseCode = '000';
         $requestType = 'UNKNOWN';
-        $reuestUrl = 'https://unknown.url';
-        $this->pcpApiLog($requestType, $reuestUrl, $requestJson, $responseJson, $responseCode, $merchantReference);
+        $requestUrl = 'https://unknown.url';
+        $this->pcpApiLog(
+            $requestType,
+            $requestUrl,
+            $requestJson,
+            $responseJson,
+            $responseCode,
+            $merchantReference
+        );
 
         Registry::getLogger()->error('Saved commerce case id ' . $response->getCommerceCaseId() . ' and checkout id ' . $response->getCheckout()->getCheckoutId() . ' with merchant reference ' . $merchantReference);
         Registry::getSession()->setVariable('pcpCommerceCaseId', $response->getCommerceCaseId());
@@ -355,12 +367,12 @@ class PayoneApiService
                 'completePaymentRequest' => $completePaymentRequest,
             ];
 
-            $requestJson = json_encode(print_r($request, true));
-            $responseJson = json_encode(print_r($response, true));
+            $requestJson = $this->sdkObjectToJson($request);
+            $responseJson = $this->sdkObjectToJson($response);
             $responseCode = '000';
             $requestType = 'UNKNOWN';
-            $reuestUrl = 'https://unknown.url';
-            $this->pcpApiLog($requestType, $reuestUrl, $requestJson, $responseJson, $responseCode, $merchantReference);
+            $requestUrl = 'https://unknown.url';
+            $this->pcpApiLog($requestType, $requestUrl, $requestJson, $responseJson, $responseCode, $merchantReference);
 
             return $response;
         } catch (ApiErrorResponseException $e) {
@@ -654,6 +666,88 @@ class PayoneApiService
     {
         $oCur = Registry::getConfig()->getActShopCurrencyObject();
         return (int) round($dPrice * pow(10, $oCur->decimal));
+    }
+
+    private function sdkObjectToJson(mixed $value): string
+    {
+        return json_encode(
+            $this->toJsonValue($value),
+            JSON_PRETTY_PRINT
+            | JSON_UNESCAPED_SLASHES
+            | JSON_UNESCAPED_UNICODE
+            | JSON_THROW_ON_ERROR
+        );
+    }
+
+    private function toJsonValue(mixed $value): mixed
+    {
+        if ($value === null || is_scalar($value)) {
+            return $value;
+        }
+
+        if ($value instanceof DateTimeInterface) {
+            $timezone = $value->format('P');
+
+            return $value->format('Y-m-d\TH:i:s.u')
+                . ($timezone === '+00:00' ? 'Z' : $timezone);
+        }
+
+        if ($value instanceof BackedEnum) {
+            return $value->value;
+        }
+
+        if ($value instanceof UnitEnum) {
+            return $value->name;
+        }
+
+        if (is_array($value)) {
+            $result = [];
+
+            foreach ($value as $key => $item) {
+                $result[$key] = $this->toJsonValue($item);
+            }
+
+            return $result;
+        }
+
+        if (!is_object($value)) {
+            return $value;
+        }
+
+        // Bevorzugt eine native Serialisierung, falls das SDK sie anbietet.
+        if ($value instanceof JsonSerializable) {
+            return $this->toJsonValue($value->jsonSerialize());
+        }
+
+        // Geschützte und private Properties aus dem SDK-Modell auslesen.
+        $data = [];
+        $reflection = new ReflectionObject($value);
+
+        do {
+            foreach ($reflection->getProperties() as $property) {
+                if (
+                    $property->isStatic()
+                    || $property->getDeclaringClass()->getName() !== $reflection->getName()
+                    || !$property->isInitialized($value)
+                ) {
+                    continue;
+                }
+
+                $property->setAccessible(true);
+                $data[$property->getName()] = $this->toJsonValue(
+                    $property->getValue($value)
+                );
+            }
+
+            $reflection = $reflection->getParentClass();
+        } while ($reflection);
+
+        // SDK-Enums erscheinen im print_r als Objekte mit name und value.
+        if (array_key_exists('name', $data) && array_key_exists('value', $data)) {
+            return $data['value'];
+        }
+
+        return $data;
     }
 
     public function generateReference(string $sPrefix = 'dm'): string
