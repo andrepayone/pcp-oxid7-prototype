@@ -752,7 +752,8 @@ class PayoneApiService
 
     public function generateReference(string $sPrefix = 'dm'): string
     {
-        return $sPrefix . date('YmdHis');
+        $globalPrefix = $this->pcpGetShopConfVar('pcpReferencePrefix') || '';
+        return $globalPrefix . $sPrefix . date('YmdHis');
     }
 
     /**
