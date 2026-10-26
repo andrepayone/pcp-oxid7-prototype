@@ -9,6 +9,7 @@ $aLang = [
     'SHOP_MODULE_pcpApiEndpoint'                => 'API-Endpoint (URL)',
     'SHOP_MODULE_pcpApiKey'                     => 'API-Key',
     'SHOP_MODULE_pcpApiSecret'                  => 'API-Secret',
+    'SHOP_MODULE_pcpReferencePrefix'            => 'Reference-Prefix',
     'SHOP_MODULE_pcpDemoPaymentToken'           => 'Demo Token for frictionless payments',
     'SHOP_MODULE_pcpUseFixedNoregestration'     => 'Order-Process is set to not allow user registration',
     'SHOP_MODULE_pcpUseFixedShipping'           => 'Orders will be set to a fixed shipping address',
