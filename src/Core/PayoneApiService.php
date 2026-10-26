@@ -124,7 +124,20 @@ class PayoneApiService
             ),
         );
 
-        $response = $this->commerceCaseClient->createCommerceCase($this->merchantId, $request);
+        try {
+            $response = $this->commerceCaseClient->createCommerceCase($this->merchantId, $request);
+        } catch (ApiErrorResponseException $e) {
+            $errorDetails = array_map(
+                static fn($err) => [
+                    'code' => $err->getErrorCode(),
+                    'message' => $err->getMessage(),
+                    'property' => method_exists($err, 'getPropertyName') ? $err->getPropertyName() : null,
+                ],
+                $e->getErrors()
+            );
+            $this->pcpGetLogger()->error('PCP API 400 details: ' . json_encode($errorDetails));
+            throw $e;
+        }
 
         $requestJson = $this->sdkObjectToJson($request);
         $responseJson = $this->sdkObjectToJson($response);
@@ -752,8 +765,9 @@ class PayoneApiService
 
     public function generateReference(string $sPrefix = 'dm'): string
     {
-        $globalPrefix = $this->pcpGetShopConfVar('pcpReferencePrefix') ?: '';
-        return $globalPrefix . $sPrefix . date('YmdHis');
+        $globalPrefix = (string) ($this->pcpGetShopConfVar('pcpReferencePrefix') ?: '');
+        $shortTime = substr((string) time(), -8);
+        return $globalPrefix . $sPrefix . $shortTime;
     }
 
     /**
