@@ -68,6 +68,12 @@ $aModule = [
         ],
         [
             'group' => 'connection',
+            'name' => 'pcpReferencePrefix',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'connection',
             'name'  => 'pcpDemoPaymentToken',
             'type'  => 'str',
             'value' => '',
